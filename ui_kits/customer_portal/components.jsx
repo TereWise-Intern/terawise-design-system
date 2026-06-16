@@ -279,9 +279,11 @@ function LoginScreen({ onLogin }) {
   const handleGoogle = async () => {
     setErr(''); setGLoading(true);
     try {
+      // redirect 回客戶端介面本身（不管從哪個 host 跑）
+      const redirectTo = window.location.href.split('#')[0].split('?')[0];
       const { error } = await sb.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.href.split('#')[0] },
+        options: { redirectTo },
       });
       if (error) { setErr(error.message); setGLoading(false); }
       // 成功時頁面會轉跳至 Google，回來後 sb 會自動建立 session
