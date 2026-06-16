@@ -175,6 +175,10 @@ function BrandMark({ size = 26 }) {
 
 const STATUS_LABEL = { pending: '送出委託', accepted: '已接單', filled: '完成', rejected: '失敗' };
 const MARKETS = ['US','TW','CN','HK','JP','KR','UK','EU','CA','AU','SG','IN'];
+const MARKET_CCY = { TW:'NT$', US:'US$', CN:'¥', HK:'HK$', JP:'¥', KR:'₩', UK:'£', EU:'€', CA:'C$', AU:'A$', SG:'S$', IN:'₹' };
+const MARKET_NAME = { TW:'台股', US:'美股', CN:'中國 A 股', HK:'港股', JP:'日股', KR:'韓股', UK:'英股', EU:'歐股', CA:'加股', AU:'澳股', SG:'新股', IN:'印股' };
+const mCcy = (c) => MARKET_CCY[c] || (c + ' ');
+const mName = (c) => MARKET_NAME[c] || c;
 const ORDERS = [
   { id: 'OR-0142', t: '09:31', market: 'US', sym: 'AAPL',    side: 'buy',  qty: 100,  price: 227.50, status: 'filled' },
   { id: 'OR-0141', t: '09:28', market: 'TW', sym: '2330.TW', side: 'buy',  qty: 1000, price: 1135,   status: 'accepted' },
@@ -417,13 +421,13 @@ function TradeScreen({ onSubmit }) {
             </div>
             <div style={{ padding: '4px 16px 12px' }}>
               {[
-                { k: '市場', v: market === 'US' ? '美股' : market === 'TW' ? '台股' : market },
+                { k: '市場', v: mName(market) },
                 { k: '方向', v: side === 'buy' ? '買進' : '賣出' },
                 { k: '類型', v: TYPE_LBL[type] || type },
                 { k: '效期', v: TIF_LBL[tif] || tif },
                 { k: '數量', v: Number(qty).toLocaleString() + ' 股' },
-                ...(type === 'limit' ? [{ k: '限價', v: (market === 'US' ? 'US$' : 'NT$') + ' ' + Number(price).toFixed(2) }] : []),
-                { k: '預估金額', v: (market === 'US' ? 'US$' : 'NT$') + ' ' + estimate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+                ...(type === 'limit' ? [{ k: '限價', v: mCcy(market) + ' ' + Number(price).toFixed(2) }] : []),
+                { k: '預估金額', v: mCcy(market) + ' ' + estimate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
               ].map(r => (
                 <div key={r.k} className="m-kv"><span className="k">{r.k}</span><span className="v">{r.v}</span></div>
               ))}

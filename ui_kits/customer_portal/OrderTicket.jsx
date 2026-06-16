@@ -318,7 +318,7 @@ function StepQtyPrice({ ticket, update, quote }) {
         {needsPrice && (
           <Field label="限價 Limit Price" required>
             <div className="tw-input--prefix-wrap">
-              <span className="prefix">{ticket.market === 'US' ? 'US$' : 'NT$'}</span>
+              <span className="prefix">{marketCcy(ticket.market)}</span>
               <input
                 className="tw-input is-mono"
                 value={ticket.price}
@@ -377,7 +377,7 @@ function StepConfirm({ ticket, quote, estimate, clientName }) {
         <div className="tw-kv__k">市場</div>
         <div className="tw-kv__v is-sans">
           <Badge tone={ticket.market.toLowerCase()}>{ticket.market}</Badge>
-          {ticket.market === 'US' ? '美股 · US Equities' : '台股 · TW Equities'}
+          {`${marketName(ticket.market)} · ${ticket.market} Equities`}
         </div>
         <div className="tw-kv__k">股票</div>
         <div className="tw-kv__v">{ticket.symbol} <span style={{ font: '400 13px/1.6 var(--tw-font-sans)', color: 'var(--tw-fg-4)' }}>— {quote?.name ?? '—'}</span></div>
@@ -392,14 +392,14 @@ function StepConfirm({ ticket, quote, estimate, clientName }) {
         {TYPE_NEEDS_PRICE(ticket.type) && (
           <>
             <div className="tw-kv__k">限價</div>
-            <div className="tw-kv__v">{ticket.market === 'US' ? 'US$' : 'NT$'} {Number(ticket.price).toFixed(2)}</div>
+            <div className="tw-kv__v">{marketCcy(ticket.market)} {Number(ticket.price).toFixed(2)}</div>
           </>
         )}
         <div className="tw-kv__k">預估金額</div>
         <div className="tw-kv__v" style={{ fontWeight: 600 }}>
           {estimate == null
             ? <span style={{ font: '400 13px/1.6 var(--tw-font-sans)', color: 'var(--tw-fg-3)' }}>依市場成交價結算</span>
-            : `${ticket.market === 'US' ? 'US$' : 'NT$'} ${estimate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            : `${marketCcy(ticket.market)} ${estimate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
         </div>
       </div>
     </div>
@@ -450,7 +450,7 @@ function SidePreview({ ticket, quote, estimate, step, clientName }) {
           <div className="tw-kv__k">銀行</div>
           <div className="tw-kv__v">{ticket.order_bank || '—'}</div>
           <div className="tw-kv__k">市場</div>
-          <div className="tw-kv__v is-sans">{ticket.market === 'US' ? '美股' : '台股'}</div>
+          <div className="tw-kv__v is-sans">{marketName(ticket.market)}</div>
           <div className="tw-kv__k">股票</div>
           <div className="tw-kv__v">{ticket.symbol || '—'}</div>
           <div className="tw-kv__k">類型</div>
@@ -462,7 +462,7 @@ function SidePreview({ ticket, quote, estimate, step, clientName }) {
           {TYPE_NEEDS_PRICE(ticket.type) && (
             <>
               <div className="tw-kv__k">限價</div>
-              <div className="tw-kv__v">{ticket.market === 'US' ? 'US$' : 'NT$'} {Number(ticket.price || 0).toFixed(2)}</div>
+              <div className="tw-kv__v">{marketCcy(ticket.market)} {Number(ticket.price || 0).toFixed(2)}</div>
             </>
           )}
         </div>
@@ -473,7 +473,7 @@ function SidePreview({ ticket, quote, estimate, step, clientName }) {
             <span style={{ font: '500 13px/1.3 var(--tw-font-sans)', color: 'var(--tw-fg-3)' }}>依市場成交價</span>
           ) : (
             <span style={{ font: '600 22px/1.1 var(--tw-font-mono)', color: 'var(--tw-fg-1)', fontVariantNumeric: 'tabular-nums' }}>
-              {ticket.market === 'US' ? 'US$' : 'NT$'} {estimate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {marketCcy(ticket.market)} {estimate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           )}
         </div>

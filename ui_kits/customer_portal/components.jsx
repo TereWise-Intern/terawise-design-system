@@ -200,6 +200,17 @@ const MARKETS = [
   { code: 'IN', label: '印度', flag: '🇮🇳', conv: 'west' },
 ];
 
+// Per-market currency symbol & display name (fallback for custom codes)
+const MARKET_CCY = {
+  TW: 'NT$', US: 'US$', CN: '¥', HK: 'HK$', JP: '¥', KR: '₩',
+  UK: '£', EU: '€', CA: 'C$', AU: 'A$', SG: 'S$', IN: '₹',
+};
+function marketCcy(code) { return MARKET_CCY[code] || `${code} `; }
+function marketName(code) {
+  const m = MARKETS.find(x => x.code === code);
+  return m ? m.label : code;
+}
+
 // Returns { up: cssColor, down: cssColor } for a given market code
 function getMarketColors(marketCode) {
   const m = MARKETS.find(x => x.code === marketCode);
@@ -263,6 +274,21 @@ function LoginScreen({ onLogin }) {
   const [pass,    setPass]    = useState('');
   const [err,     setErr]     = useState('');
   const [loading, setLoading] = useState(false);
+  const [gLoading, setGLoading] = useState(false);
+
+  const handleGoogle = async () => {
+    setErr(''); setGLoading(true);
+    try {
+      const { error } = await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.href.split('#')[0] },
+      });
+      if (error) { setErr(error.message); setGLoading(false); }
+      // 成功時頁面會轉跳至 Google，回來後 sb 會自動建立 session
+    } catch (e) {
+      setErr(e.message); setGLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -373,6 +399,29 @@ function LoginScreen({ onLogin }) {
             </button>
           </form>
 
+          {/* Divider */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0' }}>
+            <div style={{ flex: 1, height: 1, background: 'var(--tw-border-subtle)' }} />
+            <span style={{ font: '500 11px/1 var(--tw-font-sans)', color: 'var(--tw-fg-4)', letterSpacing: '0.04em' }}>或</span>
+            <div style={{ flex: 1, height: 1, background: 'var(--tw-border-subtle)' }} />
+          </div>
+
+          {/* Google sign-in */}
+          <button
+            type="button"
+            onClick={handleGoogle}
+            disabled={gLoading}
+            className="tw-btn tw-btn--secondary tw-btn--full tw-btn--lg"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+              <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/>
+              <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/>
+              <path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/>
+              <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
+            </svg>
+            {gLoading ? '轉接 Google…' : '使用 Google 帳號継續'}
+          </button>
+
           <div style={{
             marginTop: 18, paddingTop: 16, borderTop: '1px solid var(--tw-border-subtle)',
             font: '400 12px/1.4 var(--tw-font-sans)', color: 'var(--tw-fg-4)',
@@ -397,5 +446,6 @@ function LoginScreen({ onLogin }) {
 Object.assign(window, {
   BrandMark, Icon, Button, Field, Segmented, StatusChip, Badge, Num, Steps, Toast,
   STATUS_LABEL, MARKETS, getMarketColors, DeltaChip, LoginScreen, marketStatus, usHoursTW,
+  marketCcy, marketName,
   ORDER_TYPE_LABEL, ORDER_TYPE_SHORT, TIF_LABEL, TIF_SHORT, TYPE_NEEDS_PRICE
 });

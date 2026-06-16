@@ -11,7 +11,7 @@
     auth: {
       persistSession: true,
       autoRefreshToken: true,
-      detectSessionInUrl: false,
+      detectSessionInUrl: true,
       storage: window.localStorage,
       storageKey: 'terawise-cp-auth'   // 客戶端專用，保持登入、避免自動登出
     }

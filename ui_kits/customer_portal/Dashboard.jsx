@@ -154,7 +154,7 @@ function OrderDetail({ order, onClose }) {
                 <div className="tw-kv__k">下單帳號</div>
                 <div className="tw-kv__v">{o.account || '—'}</div>
                 <div className="tw-kv__k">市場</div>
-                <div className="tw-kv__v is-sans"><Badge tone={o.market.toLowerCase()}>{o.market}</Badge> {o.market === 'US' ? '美股' : '台股'}</div>
+                <div className="tw-kv__v is-sans"><Badge tone={o.market.toLowerCase()}>{o.market}</Badge> {marketName(o.market)}</div>
                 <div className="tw-kv__k">股票</div>
                 <div className="tw-kv__v">{o.sym} <span style={{ color: 'var(--tw-fg-4)', font: '400 13px/1 var(--tw-font-sans)' }}>— {o.name}</span></div>
                 <div className="tw-kv__k">方向</div>
@@ -168,7 +168,7 @@ function OrderDetail({ order, onClose }) {
                 {o.price != null && (
                   <>
                     <div className="tw-kv__k">委託限價</div>
-                    <div className="tw-kv__v">{o.market === 'US' ? 'US$' : 'NT$'} {o.price?.toFixed(2)}</div>
+                    <div className="tw-kv__v">{marketCcy(o.market)} {o.price?.toFixed(2)}</div>
                   </>
                 )}
                 <div className="tw-kv__k">下單時間</div>
@@ -180,11 +180,11 @@ function OrderDetail({ order, onClose }) {
                   <div style={{ font: '600 11px/1 var(--tw-font-sans)', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--tw-buy-700)', marginBottom: 10 }}>成交資訊 Execution</div>
                   <div className="tw-kv" style={{ gridTemplateColumns: '88px 1fr', rowGap: 8 }}>
                     <div className="tw-kv__k">成交價</div>
-                    <div className="tw-kv__v" style={{ fontWeight: 600 }}>{o.market === 'US' ? 'US$' : 'NT$'} {Number(o.fill_price).toFixed(2)}</div>
+                    <div className="tw-kv__v" style={{ fontWeight: 600 }}>{marketCcy(o.market)} {Number(o.fill_price).toFixed(2)}</div>
                     <div className="tw-kv__k">成交數量</div>
                     <div className="tw-kv__v">{Number(o.fill_qty ?? o.qty).toLocaleString()} 股</div>
                     <div className="tw-kv__k">成交金額</div>
-                    <div className="tw-kv__v" style={{ fontWeight: 600 }}>{o.market === 'US' ? 'US$' : 'NT$'} {(Number(o.fill_price) * Number(o.fill_qty ?? o.qty)).toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                    <div className="tw-kv__v" style={{ fontWeight: 600 }}>{marketCcy(o.market)} {(Number(o.fill_price) * Number(o.fill_qty ?? o.qty)).toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
                     <div className="tw-kv__k">成交時間</div>
                     <div className="tw-kv__v">{(o.fill_time || '').slice(0, 16).replace('T', ' ') || '—'}</div>
                   </div>
