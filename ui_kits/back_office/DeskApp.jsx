@@ -126,6 +126,7 @@ function DeskApp() {
   const [orders,      setOrders]      = useState([]);
   const [openId,      setOpenId]      = useState(null);
   const [fillTarget,  setFillTarget]  = useState(null);
+  const [acceptTarget, setAcceptTarget] = useState(null);
 
   // ── Auth ──
   useEffect(() => {
@@ -177,7 +178,9 @@ function DeskApp() {
     await sb.from('orders').update(patch).eq('id', id);
   };
 
-  const onAccept       = (id) => updateOrder(id, { status: 'accepted', owner: profile?.display_name || 'Staff' });
+  const onAccept       = (id) => { const o = orders.find(x => x.id === id); if (o) setAcceptTarget(o); };
+  const confirmAccept  = (id) => { updateOrder(id, { status: 'accepted', owner: profile?.display_name || 'Staff' }); setAcceptTarget(null); };
+  const onBulkAccept   = (ids) => ids.forEach(id => updateOrder(id, { status: 'accepted', owner: profile?.display_name || 'Staff' }));
   const onReject       = (id) => updateOrder(id, { status: 'rejected' });
   const onChangeStatus = (id, status) => updateOrder(id, { status });
   const onAssign       = (id, owner)  => updateOrder(id, { owner });
@@ -214,7 +217,7 @@ function DeskApp() {
                    : active === 'active'  ? orders.filter(o => ['pending', 'accepted'].includes(o.status))
                    : orders.filter(o => ['filled', 'rejected'].includes(o.status));
     view = <OrderQueue orders={filtered} onOpenOrder={setOpenId} openId={openId}
-             onAccept={onAccept} onReject={onReject} onChangeStatus={onChangeStatus} onAssign={onAssign} onRequestFill={onRequestFill} />;
+             onAccept={onAccept} onBulkAccept={onBulkAccept} onReject={onReject} onChangeStatus={onChangeStatus} onAssign={onAssign} onRequestFill={onRequestFill} />;
   } else if (active === 'clients') {
     view = <ClientAdmin />;
   } else if (active === 'staff') {
@@ -240,6 +243,7 @@ function DeskApp() {
         onAccept={onAccept} onReject={onReject} onChangeStatus={onChangeStatus}
         onAssign={onAssign} onAddNote={onAddNote} onRequestFill={onRequestFill} />
       {fillTarget && <FillModal order={fillTarget} onClose={() => setFillTarget(null)} onConfirm={confirmFill} />}
+      <ConfirmAcceptModal order={acceptTarget} onClose={() => setAcceptTarget(null)} onConfirm={confirmAccept} />
     </div>
   );
 }

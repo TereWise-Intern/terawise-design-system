@@ -1,7 +1,7 @@
 // ============================================================
 // TeraWise Desk — Order Queue (KPIs + filter + bulk + table)
 // ============================================================
-function OrderQueue({ orders, onOpenOrder, openId, onAccept, onReject, onChangeStatus, onAssign, onRequestFill }) {
+function OrderQueue({ orders, onOpenOrder, openId, onAccept, onBulkAccept, onReject, onChangeStatus, onAssign, onRequestFill }) {
   const [filter, setFilter] = useState('all');
   const [marketFilter, setMarketFilter] = useState('all');
   const [sideFilter, setSideFilter] = useState('all');
@@ -99,7 +99,7 @@ function OrderQueue({ orders, onOpenOrder, openId, onAccept, onReject, onChangeS
           <span className="bo-bulk__count">{selected.size}</span>
           <span>筆委託已選取</span>
           <div className="bo-bulk__spacer" />
-          <button className="bo-bulk__btn buy" onClick={() => { selected.forEach(onAccept); setSelected(new Set()); }}>
+          <button className="bo-bulk__btn buy" onClick={() => { onBulkAccept([...selected]); setSelected(new Set()); }}>
             <Icon name="check" size={12} /> 全部接單
           </button>
           <button className="bo-bulk__btn" onClick={() => { selected.forEach(id => onAssign(id, 'Sylvia Yi')); }}>

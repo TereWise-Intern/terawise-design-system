@@ -298,3 +298,44 @@ function FillModal({ order, onClose, onConfirm }) {
 }
 
 window.FillModal = FillModal;
+
+// ── Confirm-accept modal (確認接單) ──────────────────────────
+function ConfirmAcceptModal({ order, onClose, onConfirm }) {
+  if (!order) return null;
+  const o = order;
+  const MKT_CCY = { TW: 'NT$', US: 'US$', CN: '¥', HK: 'HK$', JP: '¥', KR: '₩', UK: '£', EU: '€', CA: 'C$', AU: 'A$', SG: 'S$', IN: '₹' };
+  const cur = MKT_CCY[o.market] || (o.market + ' ');
+  return (
+    <>
+      <div className="bo-scrim is-open" onClick={onClose} />
+      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: 'white', borderRadius: 8, width: 410, padding: 28, boxShadow: 'var(--tw-shadow-3)', zIndex: 90 }}>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 18 }}>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--tw-status-accepted-bg)', color: 'var(--tw-status-accepted-fg)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+            <Icon name="check" size={18} />
+          </div>
+          <div>
+            <div style={{ font: '600 16px/1 var(--tw-font-sans)', color: 'var(--tw-fg-1)' }}>確認接單</div>
+            <div style={{ font: '400 12px/1.5 var(--tw-font-sans)', color: 'var(--tw-fg-3)', marginTop: 5 }}>接單後狀態將更新為「已接單」並通知客戶。請確認委託內容無誤。</div>
+          </div>
+        </div>
+        <div className="bo-kv" style={{ background: 'var(--tw-ink-050)', borderRadius: 4, padding: '8px 12px', marginBottom: 20 }}>
+          <div className="k">委託編號</div><div className="v">{o.id}</div>
+          <div className="k">客戶</div><div className="v">{o.client} <span style={{ color: 'var(--tw-fg-4)', fontFamily: 'var(--tw-font-mono)', fontSize: 11, marginLeft: 4 }}>{o.cid}</span></div>
+          <div className="k">下單帳號</div><div className="v">{o.account || '—'}{o.order_bank ? ` · ${o.order_bank}` : ''}</div>
+          <div className="k">股票</div><div className="v">{o.sym} <Badge tone={o.market.toLowerCase()}>{o.market}</Badge></div>
+          <div className="k">方向</div><div className="v sans"><Badge tone={o.side}>{o.side === 'buy' ? 'BUY' : 'SELL'}</Badge> {o.side === 'buy' ? '買進' : '賣出'}</div>
+          <div className="k">數量</div><div className="v">{o.qty.toLocaleString()} 股</div>
+          <div className="k">價格</div><div className="v">{o.price != null ? `${cur} ${Number(o.price).toFixed(2)}` : '市價 · 依市場成交價'}</div>
+        </div>
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+          <button className="bo-btn bo-btn--secondary bo-btn--lg" onClick={onClose}>取消</button>
+          <button className="bo-btn bo-btn--accept bo-btn--lg" onClick={() => onConfirm(o.id)}>
+            <Icon name="check" size={14} /> 確認接單
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+window.ConfirmAcceptModal = ConfirmAcceptModal;
