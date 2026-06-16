@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Neutral ink scale" subtitle="10-step cool gray — text, borders, surfaces" viewport="700x120" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Colors · Neutrals</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); }
+  .grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 0; padding: 16px; }
+  .sw {
+    aspect-ratio: 1 / 1.15; padding: 10px 12px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    color: white;
+  }
+  .sw.light { color: var(--tw-ink-800); }
+  .sw .name { font: 600 11px/1.2 var(--tw-font-sans); letter-spacing: 0.04em; text-transform: uppercase; }
+  .sw .hex  { font: 500 10px/1.2 var(--tw-font-mono); opacity: 0.85; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="sw light" style="background:#FFFFFF; box-shadow: inset 0 0 0 1px var(--tw-border);"><div class="name">Ink 000</div><div class="hex">#FFFFFF</div></div>
+  <div class="sw light" style="background:#F6F8FA"><div class="name">Ink 050</div><div class="hex">#F6F8FA</div></div>
+  <div class="sw light" style="background:#EDF0F4"><div class="name">Ink 100</div><div class="hex">#EDF0F4</div></div>
+  <div class="sw light" style="background:#DCE2EA"><div class="name">Ink 200</div><div class="hex">#DCE2EA</div></div>
+  <div class="sw light" style="background:#C0C8D2"><div class="name">Ink 300</div><div class="hex">#C0C8D2</div></div>
+  <div class="sw" style="background:#98A2AF"><div class="name">Ink 400</div><div class="hex">#98A2AF</div></div>
+  <div class="sw" style="background:#6E7787"><div class="name">Ink 500</div><div class="hex">#6E7787</div></div>
+  <div class="sw" style="background:#4A5363"><div class="name">Ink 600</div><div class="hex">#4A5363</div></div>
+  <div class="sw" style="background:#2A3140"><div class="name">Ink 700</div><div class="hex">#2A3140</div></div>
+  <div class="sw" style="background:#0B0E16"><div class="name">Ink 900</div><div class="hex">#0B0E16</div></div>
+</div>
+</body>
+</html>

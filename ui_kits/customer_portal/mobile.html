@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<!-- @dsCard group="UI Kit — Customer Portal" name="Customer Portal — Mobile" subtitle="iOS frame · login, watchlist, 4-step order ticket, order list" viewport="700x820" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>TeraWise Trade — Mobile</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script type="text/babel" data-presets="env,react" src="../../ios-frame.jsx"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #1a1a2e; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: var(--tw-font-sans); }
+
+  /* ── App shell inside the phone ── */
+  .app { display: flex; flex-direction: column; height: 100%; background: var(--tw-bg-page); overflow: hidden; }
+
+  /* Login */
+  .login-wrap {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--tw-navy-900); padding: 70px 24px 32px;
+  }
+  .login-card { background: white; border-radius: 12px; padding: 24px; width: 100%; }
+  .login-card .title { font: 600 17px/1 var(--tw-font-sans); color: var(--tw-fg-1); margin-bottom: 4px; }
+  .login-card .sub { font: 400 12px/1.4 var(--tw-font-sans); color: var(--tw-fg-4); margin-bottom: 20px; }
+  .m-input {
+    width: 100%; padding: 12px 14px; border-radius: 8px;
+    border: 1px solid var(--tw-border); background: white; color: var(--tw-fg-1);
+    font: 400 15px/1 var(--tw-font-sans); outline: none; margin-bottom: 12px;
+  }
+  .m-input:focus { border-color: var(--tw-border-focus); }
+  .m-btn {
+    width: 100%; padding: 14px; border-radius: 10px; border: none;
+    font: 600 15px/1 var(--tw-font-sans); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .m-btn-primary { background: var(--tw-navy-800); color: white; }
+  .m-btn-buy  { background: var(--tw-buy-600);  color: white; }
+  .m-btn-sell { background: var(--tw-sell-600); color: white; }
+  .m-btn-sec { background: var(--tw-ink-100); color: var(--tw-fg-1); }
+
+  /* Top nav bar — extra top padding to clear iOS status bar */
+  .m-nav {
+    background: var(--tw-navy-800);
+    display: flex; align-items: center; padding: 50px 16px 8px;
+    gap: 10px; flex-shrink: 0;
+  }
+  .m-nav .title { font: 600 16px/1 var(--tw-font-serif); color: white; flex: 1; }
+  .m-nav .sub { font: 500 10px/1 var(--tw-font-sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--tw-gold-400); margin-top: 3px; }
+
+  /* Bottom tab bar */
+  .m-tabs {
+    height: 56px; background: white; border-top: 1px solid var(--tw-border);
+    display: flex; flex-shrink: 0;
+  }
+  .m-tab {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; font: 500 10px/1 var(--tw-font-sans); color: var(--tw-fg-4);
+    background: none; border: none; cursor: pointer; padding: 8px 0;
+  }
+  .m-tab.is-active { color: var(--tw-navy-800); }
+  .m-tab svg { width: 22px; height: 22px; stroke-width: 1.5; }
+
+  /* Scrollable content area */
+  .m-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Section header */
+  .m-section-h {
+    padding: 14px 16px 8px;
+    font: 600 11px/1 var(--tw-font-sans); letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--tw-fg-4);
+  }
+
+  /* Cards */
+  .m-card { background: white; margin: 0 12px 12px; border-radius: 12px; overflow: hidden; box-shadow: var(--tw-shadow-1); }
+  .m-card-head { padding: 14px 16px 10px; display: flex; align-items: center; justify-content: space-between; }
+  .m-card-title { font: 600 14px/1 var(--tw-font-sans); color: var(--tw-fg-1); }
+
+  .m-act-btn {
+    padding: 7px 14px; border-radius: 7px; border: none; cursor: pointer;
+    font: 600 12px/1 var(--tw-font-sans);
+  }
+  .m-act-buy  { background: var(--tw-buy-100);  color: var(--tw-buy-700); }
+  .m-act-sell { background: var(--tw-sell-100); color: var(--tw-sell-700); }
+
+  /* Badge / chip */
+  .m-badge { display: inline-flex; font: 600 10px/1 var(--tw-font-sans); padding: 3px 6px; border-radius: 3px; }
+  .m-badge-buy  { background: var(--tw-buy-100);  color: var(--tw-buy-700); }
+  .m-badge-sell { background: var(--tw-sell-100); color: var(--tw-sell-700); }
+  .m-badge-us   { background: var(--tw-navy-100); color: var(--tw-navy-800); }
+  .m-badge-tw   { background: var(--tw-gold-100); color: var(--tw-gold-700); }
+  .m-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    font: 600 11px/1 var(--tw-font-sans); padding: 4px 9px; border-radius: 999px; border: 1px solid;
+  }
+  .m-chip::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .m-chip-pending    { background: var(--tw-status-pending-bg);    color: var(--tw-status-pending-fg);    border-color: var(--tw-status-pending-bd); }
+  .m-chip-accepted   { background: var(--tw-status-accepted-bg);   color: var(--tw-status-accepted-fg);   border-color: var(--tw-status-accepted-bd); }
+  .m-chip-filled     { background: var(--tw-status-filled-bg);     color: var(--tw-status-filled-fg);     border-color: var(--tw-status-filled-bd); }
+  .m-chip-rejected   { background: var(--tw-status-rejected-bg);   color: var(--tw-status-rejected-fg);   border-color: var(--tw-status-rejected-bd); }
+
+  /* Order row */
+  .m-order-row { padding: 13px 16px; border-top: 1px solid var(--tw-border-subtle); display: flex; align-items: center; gap: 10px; }
+  .m-order-sym { font: 600 14px/1 var(--tw-font-mono); color: var(--tw-fg-1); }
+  .m-order-meta { font: 500 11px/1 var(--tw-font-mono); color: var(--tw-fg-4); margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+  /* Order ticket */
+  .m-ticket { padding: 16px; }
+  .m-field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+  .m-label { font: 600 12px/1 var(--tw-font-sans); color: var(--tw-fg-2); }
+  .m-seg { display: flex; border: 1px solid var(--tw-border); border-radius: 10px; overflow: hidden; }
+  .m-seg-btn { flex: 1; padding: 12px; font: 600 13px/1 var(--tw-font-sans); background: white; border: none; cursor: pointer; color: var(--tw-fg-2); }
+  .m-seg-btn + .m-seg-btn { border-left: 1px solid var(--tw-border); }
+  .m-seg-btn.on-primary { background: var(--tw-navy-800); color: white; }
+  .m-seg-btn.on-buy     { background: var(--tw-buy-600);  color: white; }
+  .m-seg-btn.on-sell    { background: var(--tw-sell-600); color: white; }
+  .m-num-input {
+    width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--tw-border);
+    font: 600 18px/1 var(--tw-font-mono); color: var(--tw-fg-1);
+    font-variant-numeric: tabular-nums; outline: none; text-align: right; background: white;
+  }
+  .m-num-input:focus { border-color: var(--tw-border-focus); }
+  .m-kv { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--tw-border-subtle); }
+  .m-kv .k { font: 400 13px/1 var(--tw-font-sans); color: var(--tw-fg-3); }
+  .m-kv .v { font: 500 13px/1 var(--tw-font-mono); color: var(--tw-fg-1); font-variant-numeric: tabular-nums; }
+  .m-ticket-foot { padding: 12px 16px 0; display: flex; gap: 10px; }
+  .m-stepper { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; }
+  .m-stepper .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tw-border-strong); }
+  .m-stepper .dot.on { background: var(--tw-navy-800); width: 20px; border-radius: 999px; }
+
+  /* Line banner */
+  .m-line-banner {
+    margin: 0 12px 12px; border-radius: 12px; padding: 14px 16px;
+    background: #06C755; display: flex; align-items: center; gap: 12px; text-decoration: none;
+  }
+  .m-line-banner .lbl { font: 600 13px/1.3 var(--tw-font-sans); color: white; }
+  .m-line-banner .sub { font: 400 11px/1.3 var(--tw-font-sans); color: rgba(255,255,255,0.85); margin-top: 3px; }
+  .m-line-arrow { margin-left: auto; color: white; opacity: 0.8; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="env,react">
+const { useState, useEffect, useRef } = React;
+
+// ── Icons ──
+function Icon({ name, size = 20, color, style }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (window.lucide && ref.current)
+      window.lucide.createIcons({ nameAttr: 'data-lucide', attrs: { width: size, height: size, 'stroke-width': 1.5 } });
+  }, [name, size]);
+  return <i ref={ref} data-lucide={name} style={{ display: 'inline-flex', color, ...style }} />;
+}
+
+function BrandMark({ size = 26 }) {
+  const Row = ({ by, w, ty, gap }) => (
+    <g fill="var(--tw-gold-500)">
+      <polygon points={`32,${by} ${32-w},${ty+2} ${32-gap/2},${ty}`} />
+      <polygon points={`32,${by} ${32+w},${ty+2} ${32+gap/2},${ty}`} />
+    </g>
+  );
+  return (
+    <svg viewBox="0 0 64 64" width={size} height={size} style={{ display: 'block' }}>
+      <Row by={22} w={8}  ty={11} gap={4} />
+      <Row by={34} w={10} ty={22} gap={5} />
+      <Row by={46} w={12} ty={33} gap={6} />
+      <rect x="30.5" y="46" width="3" height="10" fill="#8B4A24"/>
+      <rect x="19" y="55" width="26" height="2.5" fill="#8B4A24"/>
+    </svg>
+  );
+}
+
+const STATUS_LABEL = { pending: '送出委託', accepted: '已接單', filled: '完成', rejected: '失敗' };
+const MARKETS = ['US','TW','CN','HK','JP','KR','UK','EU','CA','AU','SG','IN'];
+const ORDERS = [
+  { id: 'OR-0142', t: '09:31', market: 'US', sym: 'AAPL',    side: 'buy',  qty: 100,  price: 227.50, status: 'filled' },
+  { id: 'OR-0141', t: '09:28', market: 'TW', sym: '2330.TW', side: 'buy',  qty: 1000, price: 1135,   status: 'accepted' },
+  { id: 'OR-0138', t: '09:14', market: 'US', sym: 'NVDA',    side: 'sell', qty: 50,   price: null,   status: 'pending' },
+  { id: 'OR-0090', t: '昨日',  market: 'US', sym: 'TSLA',    side: 'buy',  qty: 30,   price: 348,    status: 'filled' },
+  { id: 'OR-0078', t: '昨日',  market: 'TW', sym: '2317.TW', side: 'sell', qty: 500,  price: 185,    status: 'rejected' },
+];
+
+// ── Login ──
+function LoginScreen({ onLogin }) {
+  const [name, setName] = useState('');
+  const [pass, setPass] = useState('');
+  return (
+    <div className="login-wrap">
+      <BrandMark size={52} />
+      <div style={{ font: '600 22px/1.1 var(--tw-font-serif)', color: 'white', marginTop: 10 }}>TeraWise Capital</div>
+      <div style={{ font: '600 9px/1 var(--tw-font-sans)', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--tw-gold-400)', marginTop: 7, marginBottom: 32 }}>
+        YOUR MOST RELIABLE PARTNER
+      </div>
+      <div className="login-card">
+        <div className="title">登入</div>
+        <div className="sub">TeraWise Trade 客戶委託入口</div>
+        <input className="m-input" type="text" placeholder="姓名" value={name} onChange={e => setName(e.target.value)} />
+        <input className="m-input" type="password" placeholder="密碼" value={pass} onChange={e => setPass(e.target.value)} />
+        <button className="m-btn m-btn-primary" onClick={() => name && onLogin(name)}>登入</button>
+      </div>
+      <div style={{ marginTop: 24, font: '400 11px/1.4 var(--tw-font-sans)', color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>
+        © 2025 TeraWise Capital
+      </div>
+    </div>
+  );
+}
+
+// ── Bottom Tab Bar ──
+function TabBar({ tab, setTab }) {
+  const tabs = [
+    { id: 'home',   icon: 'layout-dashboard', label: '總覽' },
+    { id: 'trade',  icon: 'trending-up',       label: '下單' },
+  ];
+  return (
+    <div className="m-tabs">
+      {tabs.map(t => (
+        <button key={t.id} className={`m-tab ${tab === t.id ? 'is-active' : ''}`} onClick={() => setTab(t.id)}>
+          <Icon name={t.icon} size={22} />
+          {t.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ── Home Screen ──
+function HomeScreen({ userName, onTrade }) {
+  return (
+    <div className="m-content">
+      <div style={{ padding: '16px 16px 4px' }}>
+        <div style={{ font: '600 20px/1.2 var(--tw-font-sans)', color: 'var(--tw-fg-1)' }}>午安，{userName}。</div>
+        <div style={{ font: '400 12px/1 var(--tw-font-sans)', color: 'var(--tw-fg-4)', marginTop: 5 }}>
+          兆易觀點 · 美股已開盤
+        </div>
+      </div>
+
+      {/* LINE banner */}
+      <div style={{ padding: '12px 12px 0' }}>
+        <a href="https://lin.ee/ofwCuzI" target="_blank" rel="noopener noreferrer" className="m-line-banner" style={{ display: 'flex', textDecoration: 'none' }}>
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="white" fillOpacity="0.25"/>
+            <path d="M26 14.4C26 9.76 21.52 6 16 6C10.48 6 6 9.76 6 14.4C6 18.56 9.6 22.04 14.48 22.68C14.84 22.76 15.32 22.92 15.44 23.24C15.56 23.52 15.52 23.96 15.48 24.24L15.28 25.44C15.2 25.76 15.04 26.68 16 26.28C16.96 25.88 21.2 23.12 23.12 20.92C24.44 19.44 26 17.08 26 14.4Z" fill="white"/>
+          </svg>
+          <div>
+            <div className="lbl">加入 LINE 獲取每日研究報告</div>
+            <div className="sub">兆易觀點 · 全球市場動態</div>
+          </div>
+          <span className="m-line-arrow"><Icon name="chevron-right" size={18} color="white" /></span>
+        </a>
+      </div>
+
+      {/* Orders */}
+      <div className="m-section-h">委託紀錄 Orders</div>
+      <div className="m-card">
+        {ORDERS.map((o, i) => (
+          <div key={o.id} className="m-order-row" style={i === 0 ? { borderTop: 'none' } : {}}>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
+                <div className="m-order-sym">{o.sym}</div>
+                <span className={`m-badge m-badge-${o.side}`}>{o.side === 'buy' ? 'BUY' : 'SELL'}</span>
+                <span className={`m-badge m-badge-${o.market.toLowerCase()}`}>{o.market}</span>
+              </div>
+              <div className="m-order-meta">
+                {o.t} · {o.qty.toLocaleString()} 股 · {o.price ? '@' + o.price : 'MKT'}
+              </div>
+            </div>
+            <span className={`m-chip m-chip-${o.status}`}>{STATUS_LABEL[o.status]}</span>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  );
+}
+
+// ── Trade Screen ──
+function TradeScreen({ onSubmit }) {
+  const [step, setStep] = useState(0);
+  const [market, setMarket] = useState('US');
+  const [sym, setSym] = useState('AAPL');
+  const [side, setSide] = useState('buy');
+  const [type, setType] = useState('limit');
+  const [tif, setTif] = useState('rod');
+  const [qty, setQty] = useState('100');
+  const [price, setPrice] = useState('227.50');
+  const [done, setDone] = useState(false);
+
+  if (done) return (
+    <div className="m-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: 32 }}>
+      <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'var(--tw-buy-100)', color: 'var(--tw-buy-700)', display: 'grid', placeItems: 'center', marginBottom: 16 }}>
+        <Icon name="check" size={32} />
+      </div>
+      <div style={{ font: '600 18px/1.3 var(--tw-font-sans)', color: 'var(--tw-fg-1)', textAlign: 'center', marginBottom: 8 }}>委託已送出</div>
+      <div style={{ font: '400 13px/1.5 var(--tw-font-sans)', color: 'var(--tw-fg-4)', textAlign: 'center', marginBottom: 28 }}>
+        後台人員將於數分鐘內接單並更新狀態。
+      </div>
+      <div style={{ padding: '10px 16px', background: 'var(--tw-navy-050)', border: '1px solid var(--tw-navy-100)', borderRadius: 8, font: '600 14px/1 var(--tw-font-mono)' }}>
+        OR-20250218-0145
+      </div>
+      <button className="m-btn m-btn-sec" style={{ marginTop: 24, width: '100%', borderRadius: 10 }} onClick={() => { setDone(false); setStep(0); }}>
+        建立新委託
+      </button>
+    </div>
+  );
+
+  const steps = ['市場 / 股票', '買賣 / 類型', '數量 / 限價', '確認送出'];
+  const estimate = (Number(qty) || 0) * (type === 'limit' ? (Number(price) || 0) : 228);
+  const TYPE_LBL = { limit: '限價 LIMIT', market: '市價 MARKET', at_open: '開盤價 @market open price', at_close: '收盤價 @market close price' };
+  const TYPE_SHORT = { limit: '限價', market: '市價', at_open: '@market open', at_close: '@market close' };
+  const TIF_LBL = { rod: 'ROD 當日有效', ioc: 'IOC', fok: 'FOK' };
+
+  return (
+    <div className="m-content">
+      {/* Step dots */}
+      <div className="m-stepper">
+        {steps.map((_, i) => <div key={i} className={`dot ${i === step ? 'on' : ''}`} />)}
+      </div>
+      <div style={{ padding: '0 16px 8px', font: '600 15px/1 var(--tw-font-sans)', color: 'var(--tw-fg-1)' }}>
+        {steps[step]}
+      </div>
+
+      <div className="m-ticket">
+        {step === 0 && (
+          <>
+            <div className="m-field">
+              <div className="m-label">市場別</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
+                {MARKETS.map(m => (
+                  <button key={m}
+                    onClick={() => setMarket(m)}
+                    style={{
+                      padding: '10px 4px', borderRadius: 8, border: '1px solid',
+                      borderColor: market === m ? 'var(--tw-navy-800)' : 'var(--tw-border)',
+                      background: market === m ? 'var(--tw-navy-800)' : 'white',
+                      color: market === m ? 'white' : 'var(--tw-fg-2)',
+                      font: '600 12px/1 var(--tw-font-mono)', cursor: 'pointer'
+                    }}>{m}</button>
+                ))}
+              </div>
+            </div>
+            <div className="m-field">
+              <div className="m-label">股票代碼</div>
+              <input className="m-num-input" style={{ textAlign: 'left', fontSize: 16 }}
+                value={sym} onChange={e => setSym(e.target.value.toUpperCase())} placeholder="例如 AAPL, 2330.TW" />
+            </div>
+          </>
+        )}
+        {step === 1 && (
+          <>
+            <div className="m-field">
+              <div className="m-label">買賣方向</div>
+              <div className="m-seg">
+                <button className={`m-seg-btn ${side === 'buy' ? 'on-buy' : ''}`} onClick={() => setSide('buy')}>買進 BUY</button>
+                <button className={`m-seg-btn ${side === 'sell' ? 'on-sell' : ''}`} onClick={() => setSide('sell')}>賣出 SELL</button>
+              </div>
+            </div>
+            <div className="m-field">
+              <div className="m-label">委託類型</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6 }}>
+                {['limit','market','at_open','at_close'].map(tp => (
+                  <button key={tp}
+                    onClick={() => setType(tp)}
+                    style={{
+                      padding: '10px 2px', borderRadius: 8, border: '1px solid',
+                      borderColor: type === tp ? 'var(--tw-navy-800)' : 'var(--tw-border)',
+                      background: type === tp ? 'var(--tw-navy-800)' : 'white',
+                      color: type === tp ? 'white' : 'var(--tw-fg-2)',
+                      font: '600 12px/1 var(--tw-font-sans)', cursor: 'pointer'
+                    }}>{TYPE_SHORT[tp]}</button>
+                ))}
+              </div>
+            </div>
+            <div className="m-field">
+              <div className="m-label">委託效期</div>
+              <div className="m-seg">
+                <button className={`m-seg-btn ${tif === 'rod' ? 'on-primary' : ''}`} onClick={() => setTif('rod')}>ROD 當日</button>
+                <button className={`m-seg-btn ${tif === 'ioc' ? 'on-primary' : ''}`} onClick={() => setTif('ioc')}>IOC</button>
+                <button className={`m-seg-btn ${tif === 'fok' ? 'on-primary' : ''}`} onClick={() => setTif('fok')}>FOK</button>
+              </div>
+            </div>
+            <div style={{ padding: '12px 14px', background: 'var(--tw-navy-050)', border: '1px solid var(--tw-navy-100)', borderRadius: 10, font: '400 12px/1.5 var(--tw-font-sans)', color: 'var(--tw-fg-2)' }}>
+              <Icon name="info" size={14} color="var(--tw-navy-500)" style={{ verticalAlign: 'middle', marginRight: 6 }} />
+              委託送出後僅後台人員可協助取消。
+            </div>
+          </>
+        )}
+        {step === 2 && (
+          <>
+            <div className="m-field">
+              <div className="m-label">數量（股）</div>
+              <input className="m-num-input" type="number" value={qty} onChange={e => setQty(e.target.value)} />
+              <div style={{ display: 'flex', gap: 8 }}>
+                {[10, 50, 100, 500].map(n => (
+                  <button key={n} onClick={() => setQty(String(n))} style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1px solid var(--tw-border)', background: 'white', font: '500 12px/1 var(--tw-font-mono)', cursor: 'pointer' }}>
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {type === 'limit' && (
+              <div className="m-field">
+                <div className="m-label">限價</div>
+                <input className="m-num-input" type="number" step="0.01" value={price} onChange={e => setPrice(e.target.value)} />
+              </div>
+            )}
+          </>
+        )}
+        {step === 3 && (
+          <div style={{ background: 'white', border: '1px solid var(--tw-border)', borderRadius: 12, overflow: 'hidden' }}>
+            <div style={{ padding: '12px 16px', background: side === 'buy' ? 'var(--tw-buy-050)' : 'var(--tw-sell-050)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span className={`m-badge m-badge-${side}`}>{side === 'buy' ? 'BUY' : 'SELL'}</span>
+              <span style={{ font: '600 14px/1 var(--tw-font-mono)' }}>{sym}</span>
+              <span className={`m-badge m-badge-${market.toLowerCase()}`}>{market}</span>
+            </div>
+            <div style={{ padding: '4px 16px 12px' }}>
+              {[
+                { k: '市場', v: market === 'US' ? '美股' : market === 'TW' ? '台股' : market },
+                { k: '方向', v: side === 'buy' ? '買進' : '賣出' },
+                { k: '類型', v: TYPE_LBL[type] || type },
+                { k: '效期', v: TIF_LBL[tif] || tif },
+                { k: '數量', v: Number(qty).toLocaleString() + ' 股' },
+                ...(type === 'limit' ? [{ k: '限價', v: (market === 'US' ? 'US$' : 'NT$') + ' ' + Number(price).toFixed(2) }] : []),
+                { k: '預估金額', v: (market === 'US' ? 'US$' : 'NT$') + ' ' + estimate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+              ].map(r => (
+                <div key={r.k} className="m-kv"><span className="k">{r.k}</span><span className="v">{r.v}</span></div>
+              ))}
+            </div>
+            <div style={{ padding: '0 16px 14px', font: '400 11px/1.5 var(--tw-font-sans)', color: 'var(--tw-fg-4)' }}>
+              送出後無法由客戶端自行取消，請確認內容正確。
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="m-ticket-foot">
+        {step > 0 && <button className="m-btn m-btn-sec" style={{ flex: 1, borderRadius: 10 }} onClick={() => setStep(s => s - 1)}>返回</button>}
+        {step < 3 && <button className="m-btn m-btn-primary" style={{ flex: 2, borderRadius: 10 }} onClick={() => setStep(s => s + 1)}>下一步</button>}
+        {step === 3 && (
+          <button className={`m-btn ${side === 'buy' ? 'm-btn-buy' : 'm-btn-sell'}`}
+            style={{ flex: 1, borderRadius: 10 }}
+            onClick={() => setDone(true)}>
+            {side === 'buy' ? '確認買進' : '確認賣出'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── App ──
+function App() {
+  const [user, setUser]   = useState(null);
+  const [tab,  setTab]    = useState('home');
+
+  if (!user) return (
+    <IOSDevice dark width={390} height={844}>
+      <div className="app">
+        <LoginScreen onLogin={setUser} />
+      </div>
+    </IOSDevice>
+  );
+
+  return (
+    <IOSDevice dark width={390} height={844}>
+      <div className="app">
+        <div className="m-nav">
+          <BrandMark size={22} />
+          <div>
+            <div className="title">TeraWise Trade</div>
+          </div>
+          <div style={{ marginLeft: 'auto', width: 28, height: 28, borderRadius: '50%', background: 'var(--tw-gold-600)', color: 'var(--tw-navy-900)', display: 'grid', placeItems: 'center', font: '600 11px/1 var(--tw-font-sans)', cursor: 'pointer' }}
+            onClick={() => setUser(null)}>{user.slice(-2)}</div>
+        </div>
+        {tab === 'home'   && <HomeScreen userName={user} onTrade={() => setTab('trade')} />}
+        {tab === 'trade'  && <TradeScreen />}
+        <TabBar tab={tab} setTab={setTab} />
+      </div>
+    </IOSDevice>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

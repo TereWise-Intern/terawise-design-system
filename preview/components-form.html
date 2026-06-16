@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Form fields" subtitle="Inputs, segmented controls, error state" viewport="700x320" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Components · Form fields</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 22px 24px; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); color: var(--tw-fg-2); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 22px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .lbl { font: 600 12px/1 var(--tw-font-sans); color: var(--tw-fg-2); }
+  .lbl .req { color: var(--tw-sell-600); margin-left: 2px; }
+  input, select {
+    font: 400 14px/1.4 var(--tw-font-sans);
+    padding: 9px 12px; border-radius: 4px;
+    border: 1px solid var(--tw-border); background: white; color: var(--tw-fg-1);
+    outline: none; transition: border-color 80ms ease, box-shadow 80ms ease;
+  }
+  input[type=text].mono { font-family: var(--tw-font-mono); font-weight: 500; }
+  input:focus, select:focus {
+    border-color: var(--tw-border-focus);
+    box-shadow: 0 0 0 3px rgba(44, 85, 130, 0.18);
+  }
+  .hint { font: 400 11px/1.3 var(--tw-font-sans); color: var(--tw-fg-4); }
+  .err  { font: 500 11px/1.3 var(--tw-font-sans); color: var(--tw-sell-700); }
+  .seg { display: flex; border: 1px solid var(--tw-border); border-radius: 4px; overflow: hidden; }
+  .seg button {
+    flex: 1; font: 600 13px/1 var(--tw-font-sans); padding: 9px 0;
+    background: white; border: none; cursor: pointer; color: var(--tw-fg-2);
+  }
+  .seg button.on { background: var(--tw-navy-800); color: white; }
+  .seg button + button { border-left: 1px solid var(--tw-border); }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="field">
+    <div class="lbl">股票代碼 Symbol <span class="req">*</span></div>
+    <input type="text" class="mono" value="AAPL">
+    <div class="hint">輸入代碼後按 Enter 查詢即時報價</div>
+  </div>
+  <div class="field">
+    <div class="lbl">市場別 Market</div>
+    <select><option>US — 美股</option><option>TW — 台股</option></select>
+  </div>
+  <div class="field">
+    <div class="lbl">買賣方向</div>
+    <div class="seg">
+      <button class="on">買進 BUY</button>
+      <button>賣出 SELL</button>
+    </div>
+  </div>
+  <div class="field">
+    <div class="lbl">委託類型</div>
+    <div class="seg">
+      <button class="on">限價 Limit</button>
+      <button>市價 Market</button>
+    </div>
+  </div>
+  <div class="field">
+    <div class="lbl">數量 Qty (股) <span class="req">*</span></div>
+    <input type="text" class="mono" value="100">
+  </div>
+  <div class="field">
+    <div class="lbl">限價 Limit Price</div>
+    <input type="text" class="mono" value="227.50" style="border-color: var(--tw-sell-500); box-shadow: 0 0 0 3px rgba(178, 34, 41, 0.12);">
+    <div class="err">超出當日漲跌幅範圍 10%</div>
+  </div>
+</div>
+</body>
+</html>

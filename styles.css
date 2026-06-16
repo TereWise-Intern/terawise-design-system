@@ -1,0 +1,8 @@
+/* ============================================================
+   TeraWise Capital — Design System root stylesheet
+   Single entry point the compiler reads. It @imports the token
+   source (colors, type, semantic palette, shadows, spacing).
+   UI-kit-specific styles live in ui_kits/*/styles.css and are
+   linked directly by each app, not bundled globally.
+   ============================================================ */
+@import "./colors_and_type.css";

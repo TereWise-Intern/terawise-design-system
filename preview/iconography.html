@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Iconography (Lucide)" subtitle="Lucide 1.5 px stroke — substitute flag (no native set provided)" viewport="700x280" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Iconography · Lucide</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 22px 24px; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); color: var(--tw-fg-3); }
+  .grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px 14px; }
+  .ic {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 10px 4px; border: 1px solid var(--tw-border-subtle); border-radius: 4px;
+    background: white;
+  }
+  .ic svg { width: 20px; height: 20px; color: var(--tw-fg-2); stroke-width: 1.5; }
+  .ic .nm { font: 500 10px/1 var(--tw-font-mono); color: var(--tw-fg-4); }
+  .head { font: var(--tw-text-overline); letter-spacing: var(--tw-letter-overline); text-transform: uppercase; color: var(--tw-fg-4); margin: 0 0 10px; }
+</style>
+</head>
+<body>
+<div class="head">Lucide · 1.5 px stroke · currentColor</div>
+<div class="grid" id="icons"></div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  const list = [
+    'trending-up','trending-down','arrow-up-right','arrow-down-right',
+    'circle-dollar-sign','line-chart','candlestick-chart','bar-chart-3',
+    'wallet','briefcase','search','filter',
+    'check','x','alert-triangle','clock',
+    'user','users','bell','settings',
+    'chevron-down','chevron-right','arrow-up-down','log-out'
+  ];
+  const root = document.getElementById('icons');
+  list.forEach(n => {
+    const cell = document.createElement('div');
+    cell.className = 'ic';
+    cell.innerHTML = `<i data-lucide="${n}"></i><div class="nm">${n}</div>`;
+    root.appendChild(cell);
+  });
+  lucide.createIcons();
+</script>
+</body>
+</html>

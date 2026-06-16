@@ -1,0 +1,236 @@
+/* ============================================================
+   TeraWise Capital — Colors & Type
+   兆易觀點｜投行 / 券商級交易委託平台
+   ============================================================
+   Inspired by Bloomberg Terminal, Goldman Sachs Marquee,
+   Interactive Brokers, traditional 投行 brand systems.
+   Deep navy + bone white + warm gold accents (from logo).
+   ============================================================ */
+
+/* ---------- Fonts ----------
+   Display / wordmark:  "Source Serif 4"  (transitional serif — close match to logo)
+   UI sans (Latin):     "Inter"           (precise, screen-tuned)
+   UI sans (CJK 繁中):   "Noto Sans TC"    (繁體中文 — 黑體)
+   Tabular numerals:    "JetBrains Mono"  (used for prices, ticker, order ids)
+   ---------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ---------- Brand / Core palette ---------- */
+  --tw-navy-900: #0A1A2F;   /* deepest — page bg in dark surfaces, terminal */
+  --tw-navy-800: #0F2540;   /* primary brand navy — header, brand chips */
+  --tw-navy-700: #16314F;   /* hover / active on navy surfaces */
+  --tw-navy-600: #1E3F62;   /* secondary navy — borders on dark */
+  --tw-navy-500: #2C5582;   /* accent navy for links / focus */
+  --tw-navy-400: #4577A8;   /* hover link */
+  --tw-navy-200: #C2D2E3;   /* tinted bg on light, table header */
+  --tw-navy-100: #E4ECF4;   /* soft navy wash */
+  --tw-navy-050: #F2F6FA;   /* lightest navy wash — section bg */
+
+  /* ---------- Gold (from logo wheat) ---------- */
+  --tw-gold-700: #8C6210;
+  --tw-gold-600: #B4831C;   /* logo gold */
+  --tw-gold-500: #D2A23A;   /* highlight / chips */
+  --tw-gold-400: #E5BE63;
+  --tw-gold-100: #F7ECCB;   /* warm wash */
+  --tw-gold-050: #FBF6E8;
+
+  /* ---------- Logo stem (brown) ---------- */
+  --tw-clay-700: #6B3A1E;   /* deep brown — used very sparingly */
+  --tw-clay-600: #8B4A24;   /* logo stem */
+  --tw-clay-100: #F0E0D2;
+
+  /* ---------- Neutrals (cool gray, finance terminal feel) ---------- */
+  --tw-ink-000: #FFFFFF;
+  --tw-ink-050: #F6F8FA;
+  --tw-ink-100: #EDF0F4;    /* subtle dividers / chip bg */
+  --tw-ink-200: #DCE2EA;    /* borders */
+  --tw-ink-300: #C0C8D2;    /* disabled */
+  --tw-ink-400: #98A2AF;    /* placeholder, muted icons */
+  --tw-ink-500: #6E7787;    /* tertiary text */
+  --tw-ink-600: #4A5363;    /* secondary text */
+  --tw-ink-700: #2A3140;    /* primary text on light */
+  --tw-ink-800: #161B27;    /* headings */
+  --tw-ink-900: #0B0E16;    /* terminal black */
+
+  /* ---------- Semantic: directional colors (market-aware) ----------
+     BUY / SELL action buttons are always green / red (instrument direction).
+     UP / DOWN delta colors ARE market-aware — use the JS helper getMarketColors(marketCode).
+     ----------------------------------------------------------------
+     Supported conventions:
+       Western (US, UK, EU, CA, AU, IN)  → green up, red down
+       East-Asian (TW, CN, HK*, SG*)     → red up, green down
+       Japan                             → red up, blue/green down
+       Korea                             → red up, blue down
+     *HK and SG default to East-Asian (switchable in product settings)
+     ---------------------------------------------------------------- */
+
+  /* --- Action green (BUY buttons; also "up" in Western markets) --- */
+  --tw-green-700: #0E6B3E;
+  --tw-green-600: #137C49;
+  --tw-green-500: #1B9A5C;
+  --tw-green-400: #38B574;
+  --tw-green-100: #DCF1E5;
+  --tw-green-050: #EEF8F2;
+
+  /* --- Action red (SELL buttons; also "up" in East-Asian markets) --- */
+  --tw-red-700: #9B1B22;
+  --tw-red-600: #B22229;
+  --tw-red-500: #D02C34;
+  --tw-red-400: #E25058;
+  --tw-red-100: #FBE0E2;
+  --tw-red-050: #FCEFF0;
+
+  /* --- Blue-down (used for "down" in KR and JP markets) --- */
+  --tw-blue-dn-700: #0A4272;
+  --tw-blue-dn-600: #1054A0;
+  --tw-blue-dn-500: #1A6BC4;
+  --tw-blue-dn-400: #4A90D9;
+  --tw-blue-dn-100: #D8EAFB;
+  --tw-blue-dn-050: #EEF5FD;
+
+  /* --- Aliases: BUY/SELL action always green/red regardless of market --- */
+  --tw-buy-700:  var(--tw-green-700);
+  --tw-buy-600:  var(--tw-green-600);
+  --tw-buy-500:  var(--tw-green-500);
+  --tw-buy-400:  var(--tw-green-400);
+  --tw-buy-100:  var(--tw-green-100);
+  --tw-buy-050:  var(--tw-green-050);
+
+  --tw-sell-700: var(--tw-red-700);
+  --tw-sell-600: var(--tw-red-600);
+  --tw-sell-500: var(--tw-red-500);
+  --tw-sell-400: var(--tw-red-400);
+  --tw-sell-100: var(--tw-red-100);
+  --tw-sell-050: var(--tw-red-050);
+
+  /* ---------- Semantic: status colors for order lifecycle ---------- */
+  --tw-status-pending-bg:    #FFF6E0;   /* 待確認 — warm amber */
+  --tw-status-pending-fg:    #8A5A05;
+  --tw-status-pending-bd:    #F0D58A;
+
+  --tw-status-accepted-bg:   #E4ECF4;   /* 已接單 — navy tint */
+  --tw-status-accepted-fg:   #0F2540;
+  --tw-status-accepted-bd:   #B2C5DA;
+
+  --tw-status-processing-bg: #E6F1FA;   /* 處理中 — info blue */
+  --tw-status-processing-fg: #0A4D85;
+  --tw-status-processing-bd: #9BC4E5;
+
+  --tw-status-filled-bg:     #DCF1E5;   /* 已完成 — buy green */
+  --tw-status-filled-fg:     #0E6B3E;
+  --tw-status-filled-bd:     #8AC9A6;
+
+  --tw-status-cancelled-bg:  #EDF0F4;   /* 已取消 — neutral */
+  --tw-status-cancelled-fg:  #4A5363;
+  --tw-status-cancelled-bd:  #C0C8D2;
+
+  --tw-status-rejected-bg:   #FBE0E2;   /* 已拒絕 — sell red */
+  --tw-status-rejected-fg:   #9B1B22;
+  --tw-status-rejected-bd:   #E89AA0;
+
+  /* ---------- Surfaces ---------- */
+  --tw-bg-page:       var(--tw-ink-050);
+  --tw-bg-canvas:     var(--tw-ink-000);
+  --tw-bg-subtle:     var(--tw-navy-050);
+  --tw-bg-terminal:   var(--tw-navy-900);   /* dark surfaces / admin density */
+  --tw-bg-header:     var(--tw-navy-800);   /* top nav */
+
+  /* ---------- Borders ---------- */
+  --tw-border-subtle: var(--tw-ink-100);
+  --tw-border:        var(--tw-ink-200);
+  --tw-border-strong: var(--tw-ink-300);
+  --tw-border-focus:  var(--tw-navy-500);
+
+  /* ---------- Text ---------- */
+  --tw-fg-1:          var(--tw-ink-800);   /* primary heading */
+  --tw-fg-2:          var(--tw-ink-700);   /* body */
+  --tw-fg-3:          var(--tw-ink-600);   /* secondary */
+  --tw-fg-4:          var(--tw-ink-500);   /* muted */
+  --tw-fg-on-navy:    #F2F6FA;
+  --tw-fg-on-navy-2:  #B2C5DA;
+  --tw-fg-link:       var(--tw-navy-500);
+
+  /* ---------- Spacing scale (4px base) ---------- */
+  --tw-space-1:  4px;
+  --tw-space-2:  8px;
+  --tw-space-3:  12px;
+  --tw-space-4:  16px;
+  --tw-space-5:  20px;
+  --tw-space-6:  24px;
+  --tw-space-7:  32px;
+  --tw-space-8:  40px;
+  --tw-space-9:  48px;
+  --tw-space-10: 64px;
+  --tw-space-11: 80px;
+  --tw-space-12: 96px;
+
+  /* ---------- Radii (restrained — financial UIs use small radii) ---------- */
+  --tw-radius-0:  0px;
+  --tw-radius-1:  2px;     /* badges, tags */
+  --tw-radius-2:  4px;     /* inputs, buttons */
+  --tw-radius-3:  6px;     /* cards */
+  --tw-radius-4:  8px;     /* dialogs */
+  --tw-radius-pill: 999px;
+
+  /* ---------- Shadows (subtle, low-spread — desk UI vibe) ---------- */
+  --tw-shadow-1: 0 1px 0 rgba(15, 37, 64, 0.04), 0 1px 2px rgba(15, 37, 64, 0.06);
+  --tw-shadow-2: 0 2px 4px rgba(15, 37, 64, 0.06), 0 4px 8px rgba(15, 37, 64, 0.04);
+  --tw-shadow-3: 0 4px 12px rgba(15, 37, 64, 0.10), 0 8px 24px rgba(15, 37, 64, 0.06);
+  --tw-shadow-popover: 0 8px 24px rgba(11, 14, 22, 0.12), 0 2px 4px rgba(11, 14, 22, 0.08);
+  --tw-shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.05);
+
+  /* ---------- Font families ---------- */
+  --tw-font-serif:   "Source Serif 4", "Noto Serif TC", Georgia, "Times New Roman", serif;
+  --tw-font-sans:    "Inter", "Noto Sans TC", -apple-system, "Segoe UI", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --tw-font-mono:    "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  /* ---------- Type ramp ----------
+     Display = serif (brand voice, marketing surface)
+     UI body = sans
+     Tabular = mono (always for $, prices, qty, P/L, order ids)
+     ------------------------------------------------------- */
+  --tw-text-display-1: 700 56px/1.1 var(--tw-font-serif);
+  --tw-text-display-2: 600 40px/1.15 var(--tw-font-serif);
+  --tw-text-display-3: 600 32px/1.2 var(--tw-font-serif);
+
+  --tw-text-h1: 600 28px/1.25 var(--tw-font-sans);
+  --tw-text-h2: 600 22px/1.3 var(--tw-font-sans);
+  --tw-text-h3: 600 18px/1.35 var(--tw-font-sans);
+  --tw-text-h4: 600 16px/1.4 var(--tw-font-sans);
+
+  --tw-text-body:        400 14px/1.55 var(--tw-font-sans);
+  --tw-text-body-lg:     400 16px/1.6 var(--tw-font-sans);
+  --tw-text-body-strong: 600 14px/1.55 var(--tw-font-sans);
+  --tw-text-small:       400 13px/1.5 var(--tw-font-sans);
+  --tw-text-caption:     500 11px/1.4 var(--tw-font-sans);
+  --tw-text-overline:    600 11px/1.4 var(--tw-font-sans);
+
+  --tw-text-num-xl: 600 32px/1.1 var(--tw-font-mono);
+  --tw-text-num-lg: 600 22px/1.15 var(--tw-font-mono);
+  --tw-text-num:    500 14px/1.4 var(--tw-font-mono);
+  --tw-text-num-sm: 500 12px/1.4 var(--tw-font-mono);
+
+  --tw-letter-overline: 0.08em;
+  --tw-letter-caps:     0.04em;
+}
+
+/* ---------- Semantic element defaults (optional, use in prototypes) ---------- */
+.tw-display-1 { font: var(--tw-text-display-1); color: var(--tw-fg-1); letter-spacing: -0.01em; }
+.tw-display-2 { font: var(--tw-text-display-2); color: var(--tw-fg-1); letter-spacing: -0.01em; }
+.tw-display-3 { font: var(--tw-text-display-3); color: var(--tw-fg-1); }
+.tw-h1 { font: var(--tw-text-h1); color: var(--tw-fg-1); letter-spacing: -0.005em; }
+.tw-h2 { font: var(--tw-text-h2); color: var(--tw-fg-1); }
+.tw-h3 { font: var(--tw-text-h3); color: var(--tw-fg-1); }
+.tw-h4 { font: var(--tw-text-h4); color: var(--tw-fg-1); }
+.tw-body { font: var(--tw-text-body); color: var(--tw-fg-2); }
+.tw-body-lg { font: var(--tw-text-body-lg); color: var(--tw-fg-2); }
+.tw-small { font: var(--tw-text-small); color: var(--tw-fg-3); }
+.tw-caption { font: var(--tw-text-caption); color: var(--tw-fg-4); letter-spacing: var(--tw-letter-caps); }
+.tw-overline {
+  font: var(--tw-text-overline); color: var(--tw-fg-4);
+  letter-spacing: var(--tw-letter-overline); text-transform: uppercase;
+}
+.tw-num { font: var(--tw-text-num); color: var(--tw-fg-1); font-variant-numeric: tabular-nums; }
+.tw-num-lg { font: var(--tw-text-num-lg); color: var(--tw-fg-1); font-variant-numeric: tabular-nums; }
+.tw-num-xl { font: var(--tw-text-num-xl); color: var(--tw-fg-1); font-variant-numeric: tabular-nums; }

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<!-- @dsCard group="UI Kit — Back Office" name="Back-Office — Mobile" subtitle="iOS frame · staff login, order queue, accept/complete/fail, client list" viewport="700x820" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>TeraWise Desk — Mobile</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script type="text/babel" data-presets="env,react" src="../../ios-frame.jsx"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #0f1b2d; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: var(--tw-font-sans); }
+  .app { display: flex; flex-direction: column; height: 100%; background: var(--tw-bg-page); overflow: hidden; }
+  .m-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Login */
+  .login-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--tw-navy-900); padding: 32px 24px; }
+  .login-card { background: white; border-radius: 12px; padding: 24px; width: 100%; }
+  .staff-btn {
+    display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px;
+    border-radius: 10px; border: 1px solid var(--tw-border); background: white; cursor: pointer;
+    margin-bottom: 8px; text-align: left;
+  }
+  .staff-btn.on { border-color: var(--tw-navy-800); background: var(--tw-navy-050); }
+  .staff-av {
+    width: 32px; height: 32px; border-radius: 50%; display: grid; placeItems: center;
+    font: 600 11px/1 var(--tw-font-sans); flexShrink: 0;
+    background: var(--tw-ink-100); color: var(--tw-fg-2);
+  }
+  .staff-av.on { background: var(--tw-navy-800); color: white; }
+  .m-input { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--tw-border); background: white; color: var(--tw-fg-1); font: 400 15px/1 var(--tw-font-sans); outline: none; margin-bottom: 12px; }
+  .m-btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font: 600 15px/1 var(--tw-font-sans); cursor: pointer; }
+  .m-btn-primary { background: var(--tw-navy-800); color: white; }
+  .m-btn-accept  { background: var(--tw-buy-600); color: white; }
+  .m-btn-reject  { background: var(--tw-sell-600); color: white; }
+  .m-btn-sec     { background: var(--tw-ink-100); color: var(--tw-fg-1); }
+
+  /* Nav */
+  .m-nav { height: 52px; background: var(--tw-navy-800); display: flex; align-items: center; padding: 0 16px; gap: 10px; flex-shrink: 0; }
+  .m-nav .title { font: 600 15px/1 var(--tw-font-serif); color: white; flex: 1; }
+
+  /* Bottom tabs */
+  .m-tabs { height: 56px; background: white; border-top: 1px solid var(--tw-border); display: flex; flex-shrink: 0; }
+  .m-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font: 500 10px/1 var(--tw-font-sans); color: var(--tw-fg-4); background: none; border: none; cursor: pointer; padding: 8px 0; }
+  .m-tab.is-active { color: var(--tw-navy-800); }
+
+  /* KPI strip */
+  .kpi-strip { display: flex; gap: 0; overflow-x: auto; padding: 12px 12px 4px; gap: 10px; }
+  .kpi-tile { background: white; border: 1px solid var(--tw-border); border-radius: 10px; padding: 12px 14px; min-width: 100px; flex-shrink: 0; }
+  .kpi-label { font: 600 10px/1 var(--tw-font-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--tw-fg-4); margin-bottom: 6px; }
+  .kpi-value { font: 600 22px/1 var(--tw-font-mono); color: var(--tw-fg-1); }
+  .kpi-sub   { font: 500 11px/1 var(--tw-font-sans); margin-top: 4px; }
+
+  /* Order card */
+  .order-card {
+    background: white; margin: 0 12px 10px; border-radius: 12px;
+    border: 1px solid var(--tw-border); overflow: hidden; box-shadow: var(--tw-shadow-1);
+  }
+  .order-card-head { padding: 12px 14px 10px; display: flex; align-items: flex-start; gap: 8px; }
+  .order-card-body { padding: 0 14px 10px; }
+  .order-card-foot { padding: 10px 14px; border-top: 1px solid var(--tw-border-subtle); display: flex; gap: 8px; }
+
+  /* Badges / chips */
+  .m-badge { display: inline-flex; font: 600 10px/1 var(--tw-font-sans); padding: 3px 7px; border-radius: 3px; }
+  .m-badge-buy  { background: var(--tw-buy-100);  color: var(--tw-buy-700); }
+  .m-badge-sell { background: var(--tw-sell-100); color: var(--tw-sell-700); }
+  .m-badge-us   { background: var(--tw-navy-100); color: var(--tw-navy-800); }
+  .m-badge-tw   { background: var(--tw-gold-100); color: var(--tw-gold-700); }
+  .m-chip { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1 var(--tw-font-sans); padding: 4px 9px; border-radius: 999px; border: 1px solid; }
+  .m-chip::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .m-chip-pending  { background: var(--tw-status-pending-bg);  color: var(--tw-status-pending-fg);  border-color: var(--tw-status-pending-bd); }
+  .m-chip-accepted { background: var(--tw-status-accepted-bg); color: var(--tw-status-accepted-fg); border-color: var(--tw-status-accepted-bd); }
+  .m-chip-filled   { background: var(--tw-status-filled-bg);   color: var(--tw-status-filled-fg);   border-color: var(--tw-status-filled-bd); }
+  .m-chip-rejected { background: var(--tw-status-rejected-bg); color: var(--tw-status-rejected-fg); border-color: var(--tw-status-rejected-bd); }
+
+  .m-act-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font: 600 13px/1 var(--tw-font-sans); display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .m-act-accept { background: var(--tw-buy-600);  color: white; }
+  .m-act-reject { background: var(--tw-sell-050); color: var(--tw-sell-700); border: 1px solid var(--tw-sell-100); }
+  .m-act-complete { background: var(--tw-buy-600); color: white; }
+  .m-act-fail   { background: var(--tw-sell-050); color: var(--tw-sell-700); border: 1px solid var(--tw-sell-100); }
+  .m-act-undo   { background: var(--tw-ink-100); color: var(--tw-fg-2); }
+  .m-act-detail { background: var(--tw-ink-050); color: var(--tw-fg-2); }
+
+  .m-kv { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--tw-border-subtle); }
+  .m-kv:last-child { border-bottom: none; }
+  .m-kv .k { font: 400 12px/1 var(--tw-font-sans); color: var(--tw-fg-4); }
+  .m-kv .v { font: 500 12px/1 var(--tw-font-mono); color: var(--tw-fg-1); font-variant-numeric: tabular-nums; }
+
+  .m-section-h { padding: 14px 16px 6px; font: 600 11px/1 var(--tw-font-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--tw-fg-4); }
+  .seg { display: flex; border: 1px solid var(--tw-border); border-radius: 8px; overflow: hidden; margin: 0 12px 12px; background: white; }
+  .seg-btn { flex: 1; padding: 9px; font: 500 12px/1 var(--tw-font-sans); background: none; border: none; cursor: pointer; color: var(--tw-fg-2); }
+  .seg-btn + .seg-btn { border-left: 1px solid var(--tw-border); }
+  .seg-btn.on { background: var(--tw-navy-800); color: white; font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="env,react">
+const { useState, useEffect, useRef } = React;
+
+function Icon({ name, size = 18, color, style }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (window.lucide && ref.current)
+      window.lucide.createIcons({ nameAttr: 'data-lucide', attrs: { width: size, height: size, 'stroke-width': 1.5 } });
+  }, [name, size]);
+  return <i ref={ref} data-lucide={name} style={{ display: 'inline-flex', color, ...style }} />;
+}
+function BrandMark({ size = 24 }) {
+  const Row = ({ by, w, ty, gap }) => (
+    <g fill="var(--tw-gold-500)">
+      <polygon points={`32,${by} ${32-w},${ty+2} ${32-gap/2},${ty}`} />
+      <polygon points={`32,${by} ${32+w},${ty+2} ${32+gap/2},${ty}`} />
+    </g>
+  );
+  return (
+    <svg viewBox="0 0 64 64" width={size} height={size} style={{ display: 'block' }}>
+      <Row by={22} w={8}  ty={11} gap={4} />
+      <Row by={34} w={10} ty={22} gap={5} />
+      <Row by={46} w={12} ty={33} gap={6} />
+      <rect x="30.5" y="46" width="3" height="10" fill="#8B4A24"/>
+      <rect x="19" y="55" width="26" height="2.5" fill="#8B4A24"/>
+    </svg>
+  );
+}
+
+const STAFF_ACCOUNTS = [
+  { name: 'Sylvia Yi', role: '管理員', initials: 'SY' },
+  { name: 'David Chen', role: '一般', initials: 'DC' },
+  { name: 'Allen Wu', role: '一般', initials: 'AW' },
+  { name: 'Joyce Liu', role: '管理員', initials: 'JL' },
+];
+const STATUS_LABEL = { pending: '送出委託', accepted: '已接單', filled: '完成', rejected: '失敗' };
+
+const INIT_ORDERS = [
+  { id: 'OR-20250218-0148', t: '14:32', client: '葉乃綺', market: 'US', sym: 'AAPL',    side: 'buy',  qty: 100,  type: 'limit',  price: 227.50,  status: 'pending' },
+  { id: 'OR-20250218-0147', t: '14:18', client: '林啟瑞', market: 'TW', sym: '2330.TW', side: 'buy',  qty: 1000, type: 'limit',  price: 1135.00, status: 'pending' },
+  { id: 'OR-20250218-0145', t: '11:42', client: '陳怡君', market: 'US', sym: 'TSLA',    side: 'buy',  qty: 30,   type: 'limit',  price: 348.00,  status: 'accepted' },
+  { id: 'OR-20250218-0144', t: '11:33', client: '蔡明達', market: 'TW', sym: '2454.TW', side: 'sell', qty: 200,  type: 'limit',  price: 1480.00, status: 'accepted' },
+  { id: 'OR-20250218-0142', t: '09:31', client: '葉乃綺', market: 'US', sym: 'AAPL',    side: 'buy',  qty: 100,  type: 'limit',  price: 227.50,  status: 'filled' },
+  { id: 'OR-20250217-0078', t: '昨日',  client: '林啟瑞', market: 'TW', sym: '2317.TW', side: 'sell', qty: 500,  type: 'limit',  price: 185.00,  status: 'rejected' },
+];
+
+// ── Login ──
+function LoginScreen({ onLogin }) {
+  const [name, setName] = useState('');
+  const [pass, setPass] = useState('');
+  return (
+    <div className="login-wrap">
+      <BrandMark size={48} />
+      <div style={{ font: '600 20px/1.1 var(--tw-font-serif)', color: 'white', marginTop: 10 }}>TeraWise Capital</div>
+      <div style={{ font: '600 9px/1 var(--tw-font-sans)', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--tw-gold-400)', marginTop: 6, marginBottom: 28 }}>DESK · 後台</div>
+      <div className="login-card">
+        <div style={{ font: '600 15px/1 var(--tw-font-sans)', color: 'var(--tw-fg-1)', marginBottom: 16 }}>後台登入</div>
+        {STAFF_ACCOUNTS.map(s => (
+          <button key={s.name} className={`staff-btn ${name === s.name ? 'on' : ''}`} onClick={() => setName(s.name)}>
+            <div className={`staff-av ${name === s.name ? 'on' : ''}`} style={{ display: 'grid', placeItems: 'center' }}>{s.initials}</div>
+            <div>
+              <div style={{ font: '500 13px/1 var(--tw-font-sans)', color: 'var(--tw-fg-1)' }}>{s.name}</div>
+              <div style={{ font: '400 11px/1 var(--tw-font-sans)', color: 'var(--tw-fg-4)', marginTop: 3 }}>{s.role}</div>
+            </div>
+          </button>
+        ))}
+        <input className="m-input" style={{ marginTop: 12 }} type="password" placeholder="密碼" value={pass} onChange={e => setPass(e.target.value)} />
+        <button className="m-btn m-btn-primary" disabled={!name} style={{ opacity: name ? 1 : 0.5 }} onClick={() => name && onLogin(STAFF_ACCOUNTS.find(s => s.name === name))}>
+          登入後台
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Order card ──
+function OrderCard({ order, onAction }) {
+  const o = order;
+  const badgeCls = `m-badge m-badge-${o.side}`;
+  const mkBadge = `m-badge m-badge-${o.market.toLowerCase()}`;
+  return (
+    <div className="order-card">
+      <div className="order-card-head">
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 5 }}>
+            <span style={{ font: '600 15px/1 var(--tw-font-mono)', color: 'var(--tw-fg-1)' }}>{o.sym}</span>
+            <span className={badgeCls}>{o.side === 'buy' ? 'BUY' : 'SELL'}</span>
+            <span className={mkBadge}>{o.market}</span>
+          </div>
+          <div style={{ font: '400 12px/1 var(--tw-font-sans)', color: 'var(--tw-fg-3)' }}>{o.client} · {o.t}</div>
+        </div>
+        <span className={`m-chip m-chip-${o.status}`}>{STATUS_LABEL[o.status]}</span>
+      </div>
+      <div className="order-card-body">
+        <div className="m-kv"><span className="k">數量</span><span className="v">{o.qty.toLocaleString()} 股</span></div>
+        <div className="m-kv"><span className="k">類型</span><span className="v">{o.type === 'limit' ? '限價' : '市價'}{o.price ? ` · ${o.price.toFixed(2)}` : ''}</span></div>
+        <div className="m-kv"><span className="k">委託編號</span><span className="v" style={{ fontSize: 11 }}>{o.id}</span></div>
+      </div>
+      {(o.status === 'pending' || o.status === 'accepted' || o.status === 'filled' || o.status === 'rejected') && (
+        <div className="order-card-foot">
+          {o.status === 'pending' && <>
+            <button className="m-act-btn m-act-accept" onClick={() => onAction(o.id, 'accepted')}>
+              <Icon name="check" size={14} /> 接單
+            </button>
+            <button className="m-act-btn m-act-reject" onClick={() => onAction(o.id, 'rejected')}>拒絕</button>
+          </>}
+          {o.status === 'accepted' && <>
+            <button className="m-act-btn m-act-complete" onClick={() => onAction(o.id, 'filled')}>
+              <Icon name="check-circle" size={14} /> 完成
+            </button>
+            <button className="m-act-btn m-act-fail" onClick={() => onAction(o.id, 'rejected')}>失敗</button>
+          </>}
+          {(o.status === 'filled' || o.status === 'rejected') && <>
+            <button className="m-act-btn m-act-undo" onClick={() => onAction(o.id, 'accepted')}>
+              <Icon name="undo-2" size={14} /> 撤回
+            </button>
+          </>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Queue Screen ──
+function QueueScreen({ orders, onAction }) {
+  const [filter, setFilter] = useState('all');
+  const filtered = orders.filter(o =>
+    filter === 'all' ? true :
+    filter === 'open' ? ['pending', 'accepted'].includes(o.status) :
+    ['filled', 'rejected'].includes(o.status)
+  );
+  const pending  = orders.filter(o => o.status === 'pending').length;
+  const accepted = orders.filter(o => o.status === 'accepted').length;
+  const filled   = orders.filter(o => o.status === 'filled').length;
+  const rejected = orders.filter(o => o.status === 'rejected').length;
+
+  return (
+    <div className="m-content">
+      {/* KPI strip */}
+      <div className="kpi-strip">
+        {[
+          { label: '送出委託', value: pending,  sub: '待接單', color: 'var(--tw-status-pending-fg)' },
+          { label: '已接單',   value: accepted, sub: '處理中', color: 'var(--tw-status-accepted-fg)' },
+          { label: '完成',     value: filled,   sub: '',       color: 'var(--tw-status-filled-fg)' },
+          { label: '失敗',     value: rejected, sub: '',       color: 'var(--tw-status-rejected-fg)' },
+        ].map(k => (
+          <div key={k.label} className="kpi-tile">
+            <div className="kpi-label">{k.label}</div>
+            <div className="kpi-value" style={{ color: k.color }}>{k.value}</div>
+            {k.sub && <div className="kpi-sub" style={{ color: k.color }}>{k.sub}</div>}
+          </div>
+        ))}
+      </div>
+
+      {/* Filter */}
+      <div className="seg">
+        {[{ v: 'all', l: '全部' }, { v: 'open', l: '處理中' }, { v: 'done', l: '已結案' }].map(o => (
+          <button key={o.v} className={`seg-btn ${filter === o.v ? 'on' : ''}`} onClick={() => setFilter(o.v)}>{o.l}</button>
+        ))}
+      </div>
+
+      {/* Orders */}
+      {filtered.map(o => <OrderCard key={o.id} order={o} onAction={onAction} />)}
+      {filtered.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--tw-fg-4)', font: '400 13px/1 var(--tw-font-sans)' }}>
+          目前沒有符合的委託。
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Clients Screen (simplified) ──
+const CLIENTS = [
+  { id: 'C-00023', name: '陳怡君', status: 'active', orders: 14, lastLogin: '14:32' },
+  { id: 'C-00081', name: '林啟瑞', status: 'active', orders: 21, lastLogin: '14:18' },
+  { id: 'C-00102', name: '蔡明達', status: 'active', orders: 6,  lastLogin: '昨日' },
+  { id: 'C-00214', name: '葉乃綺', status: 'active', orders: 5,  lastLogin: '14:32' },
+  { id: 'C-00188', name: '黃淑芬', status: 'inactive', orders: 2, lastLogin: '上週' },
+];
+function ClientsScreen() {
+  return (
+    <div className="m-content">
+      <div className="m-section-h">客戶帳號</div>
+      <div style={{ background: 'white', margin: '0 12px', borderRadius: 12, border: '1px solid var(--tw-border)', overflow: 'hidden', boxShadow: 'var(--tw-shadow-1)' }}>
+        {CLIENTS.map((c, i) => (
+          <div key={c.id} style={{
+            display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px',
+            borderTop: i > 0 ? '1px solid var(--tw-border-subtle)' : 'none'
+          }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: c.status === 'active' ? 'var(--tw-navy-100)' : 'var(--tw-ink-100)', color: c.status === 'active' ? 'var(--tw-navy-800)' : 'var(--tw-fg-4)', display: 'grid', placeItems: 'center', font: '600 13px/1 var(--tw-font-sans)', flexShrink: 0 }}>
+              {c.name.slice(0, 1)}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ font: '600 14px/1 var(--tw-font-sans)', color: 'var(--tw-fg-1)' }}>{c.name}</div>
+              <div style={{ font: '500 11px/1 var(--tw-font-mono)', color: 'var(--tw-fg-4)', marginTop: 4 }}>
+                {c.id} · {c.orders} 筆委託
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                font: '600 10px/1 var(--tw-font-sans)', padding: '3px 7px', borderRadius: 999,
+                background: c.status === 'active' ? 'var(--tw-status-filled-bg)' : 'var(--tw-status-cancelled-bg)',
+                color: c.status === 'active' ? 'var(--tw-status-filled-fg)' : 'var(--tw-status-cancelled-fg)',
+                border: '1px solid',
+                borderColor: c.status === 'active' ? 'var(--tw-status-filled-bd)' : 'var(--tw-status-cancelled-bd)',
+              }}>
+                <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor' }} />
+                {c.status === 'active' ? '啟用' : '停用'}
+              </span>
+              <div style={{ font: '500 10px/1 var(--tw-font-mono)', color: 'var(--tw-fg-4)', marginTop: 5 }}>{c.lastLogin}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── App ──
+function App() {
+  const [staff, setStaff] = useState(null);
+  const [tab, setTab] = useState('queue');
+  const [orders, setOrders] = useState(INIT_ORDERS);
+
+  const onAction = (id, newStatus) => {
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
+  };
+
+  const tabs = [
+    { id: 'queue',   icon: 'inbox',  label: '委託' },
+    { id: 'clients', icon: 'users',  label: '客戶' },
+  ];
+
+  if (!staff) return (
+    <IOSDevice dark width={390} height={844}>
+      <div className="app">
+        <LoginScreen onLogin={setStaff} />
+      </div>
+    </IOSDevice>
+  );
+
+  return (
+    <IOSDevice dark width={390} height={844}>
+      <div className="app">
+        <div className="m-nav">
+          <BrandMark size={20} />
+          <div className="title">TeraWise Desk</div>
+          <div style={{ font: '500 11px/1 var(--tw-font-sans)', color: 'var(--tw-gold-400)' }}>{staff.name}</div>
+          <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tw-fg-on-navy-2)', padding: 4 }} onClick={() => setStaff(null)}>
+            <Icon name="log-out" size={16} />
+          </button>
+        </div>
+
+        {tab === 'queue'   && <QueueScreen   orders={orders} onAction={onAction} />}
+        {tab === 'clients' && <ClientsScreen />}
+
+        <div className="m-tabs">
+          {tabs.map(t => (
+            <button key={t.id} className={`m-tab ${tab === t.id ? 'is-active' : ''}`} onClick={() => setTab(t.id)}>
+              <Icon name={t.icon} size={22} />
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </IOSDevice>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

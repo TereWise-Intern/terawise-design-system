@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Order status colors" subtitle="Lifecycle: 待確認 → 已接單 → 處理中 → 已完成 / 取消 / 拒絕" viewport="700x280" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Colors · Order status</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 20px; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); }
+  .row {
+    display: grid; grid-template-columns: 150px 100px 1fr; gap: 16px;
+    align-items: center; padding: 10px 0;
+    border-bottom: 1px solid var(--tw-border-subtle);
+    font: var(--tw-text-small);
+  }
+  .row:last-child { border-bottom: 0; }
+  .label { color: var(--tw-fg-2); font-weight: 500; }
+  .step { color: var(--tw-fg-4); font: 500 11px/1 var(--tw-font-mono); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font: 600 12px/1 var(--tw-font-sans);
+    padding: 5px 10px; border-radius: 999px;
+    border: 1px solid;
+  }
+  .chip::before {
+    content: ''; width: 6px; height: 6px; border-radius: 999px;
+    background: currentColor;
+  }
+  .pending  { background: var(--tw-status-pending-bg);    color: var(--tw-status-pending-fg);    border-color: var(--tw-status-pending-bd); }
+  .accepted { background: var(--tw-status-accepted-bg);   color: var(--tw-status-accepted-fg);   border-color: var(--tw-status-accepted-bd); }
+  .processing{background: var(--tw-status-processing-bg); color: var(--tw-status-processing-fg); border-color: var(--tw-status-processing-bd); }
+  .filled   { background: var(--tw-status-filled-bg);     color: var(--tw-status-filled-fg);     border-color: var(--tw-status-filled-bd); }
+  .cancelled{ background: var(--tw-status-cancelled-bg);  color: var(--tw-status-cancelled-fg);  border-color: var(--tw-status-cancelled-bd); }
+  .rejected { background: var(--tw-status-rejected-bg);   color: var(--tw-status-rejected-fg);   border-color: var(--tw-status-rejected-bd); }
+</style>
+</head>
+<body>
+  <div class="row"><div class="step">01 / Pending</div><span class="chip pending">待確認</span><div class="label">客戶送出後、後台尚未接單</div></div>
+  <div class="row"><div class="step">02 / Accepted</div><span class="chip accepted">已接單</span><div class="label">後台已確認委託內容</div></div>
+  <div class="row"><div class="step">03 / Processing</div><span class="chip processing">處理中</span><div class="label">送往券商通路、等待回報</div></div>
+  <div class="row"><div class="step">04 / Filled</div><span class="chip filled">已完成</span><div class="label">委託全數成交</div></div>
+  <div class="row"><div class="step">— Cancelled</div><span class="chip cancelled">已取消</span><div class="label">僅後台人員可取消（客戶端暫不開放）</div></div>
+  <div class="row"><div class="step">— Rejected</div><span class="chip rejected">已拒絕</span><div class="label">不符合委託條件、被退回</div></div>
+</body>
+</html>

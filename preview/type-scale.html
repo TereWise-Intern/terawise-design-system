@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="UI type scale" subtitle="Inter + Noto Sans TC · H1 → caption" viewport="700x320" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Type · UI sans scale</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 20px 24px; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); color: var(--tw-fg-1); }
+  .row {
+    display: grid; grid-template-columns: 130px 1fr; gap: 20px;
+    align-items: baseline; padding: 7px 0;
+    border-bottom: 1px solid var(--tw-border-subtle);
+  }
+  .row:last-child { border-bottom: 0; }
+  .meta { font: 500 11px/1.4 var(--tw-font-mono); color: var(--tw-fg-4); }
+  .h1 { font: var(--tw-text-h1); letter-spacing: -0.005em; }
+  .h2 { font: var(--tw-text-h2); }
+  .h3 { font: var(--tw-text-h3); }
+  .h4 { font: var(--tw-text-h4); }
+  .body { font: var(--tw-text-body); color: var(--tw-fg-2); }
+  .small { font: var(--tw-text-small); color: var(--tw-fg-3); }
+  .cap { font: var(--tw-text-overline); letter-spacing: var(--tw-letter-overline); text-transform: uppercase; color: var(--tw-fg-4); }
+</style>
+</head>
+<body>
+  <div class="row"><div class="meta">H1 · 28/600</div><div class="h1">下單確認 Order Confirmation</div></div>
+  <div class="row"><div class="meta">H2 · 22/600</div><div class="h2">選擇市場與股票</div></div>
+  <div class="row"><div class="meta">H3 · 18/600</div><div class="h3">委託內容 Order Ticket</div></div>
+  <div class="row"><div class="meta">H4 · 16/600</div><div class="h4">本日台股委託</div></div>
+  <div class="row"><div class="meta">Body · 14/400</div><div class="body">客戶可透過網站填寫欲交易的股票標的、買賣方向、數量、委託價格類型。</div></div>
+  <div class="row"><div class="meta">Small · 13/400</div><div class="small">送出前將顯示確認頁面，避免誤送。</div></div>
+  <div class="row"><div class="meta">Overline · 11/600</div><div class="cap">ORDER ID · 委託編號</div></div>
+</body>
+</html>

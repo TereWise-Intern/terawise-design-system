@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Radii & shadows" subtitle="Small radii, low-spread shadows — desk-UI feel" viewport="700x280" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Radii &amp; shadows</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 24px; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); color: var(--tw-fg-3); }
+  .section { display: grid; gap: 14px; }
+  .section + .section { margin-top: 22px; }
+  .head { font: var(--tw-text-overline); letter-spacing: var(--tw-letter-overline); text-transform: uppercase; color: var(--tw-fg-4); }
+  .row { display: flex; gap: 18px; align-items: flex-end; }
+  .box {
+    background: white; border: 1px solid var(--tw-border);
+    width: 88px; height: 64px;
+    display: grid; place-items: center;
+    font: 500 11px/1 var(--tw-font-mono); color: var(--tw-fg-3);
+  }
+  .lab { font: 500 11px/1 var(--tw-font-mono); color: var(--tw-fg-4); margin-top: 6px; display: block; text-align: center; }
+</style>
+</head>
+<body>
+<div class="section">
+  <div class="head">Radii</div>
+  <div class="row">
+    <div><div class="box" style="border-radius:0">0</div><span class="lab">0 px</span></div>
+    <div><div class="box" style="border-radius:2px">2</div><span class="lab">2 px · tags</span></div>
+    <div><div class="box" style="border-radius:4px">4</div><span class="lab">4 px · inputs / buttons</span></div>
+    <div><div class="box" style="border-radius:6px">6</div><span class="lab">6 px · cards</span></div>
+    <div><div class="box" style="border-radius:8px">8</div><span class="lab">8 px · dialogs</span></div>
+    <div><div class="box" style="border-radius:999px; width: 110px;">pill</div><span class="lab">pill · status chip</span></div>
+  </div>
+</div>
+<div class="section">
+  <div class="head">Shadows</div>
+  <div class="row">
+    <div><div class="box" style="border:none; box-shadow: var(--tw-shadow-1); border-radius:6px;">1</div><span class="lab">shadow-1 · card resting</span></div>
+    <div><div class="box" style="border:none; box-shadow: var(--tw-shadow-2); border-radius:6px;">2</div><span class="lab">shadow-2 · raised</span></div>
+    <div><div class="box" style="border:none; box-shadow: var(--tw-shadow-3); border-radius:6px;">3</div><span class="lab">shadow-3 · modal</span></div>
+    <div><div class="box" style="border:none; box-shadow: var(--tw-shadow-popover); border-radius:6px;">pop</div><span class="lab">popover</span></div>
+  </div>
+</div>
+</body>
+</html>

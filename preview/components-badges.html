@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Badges & status chips" subtitle="Attribute badges + order-lifecycle chips" viewport="700x200" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Components · Badges &amp; chips</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 22px 24px; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); color: var(--tw-fg-3); }
+  .head { font: var(--tw-text-overline); letter-spacing: var(--tw-letter-overline); text-transform: uppercase; color: var(--tw-fg-4); margin: 0 0 10px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .row:last-child { margin-bottom: 0; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font: 600 11px/1 var(--tw-font-sans); letter-spacing: 0.02em;
+    padding: 4px 8px; border-radius: 2px;
+  }
+  .b-buy   { background: var(--tw-buy-100);  color: var(--tw-buy-700); }
+  .b-sell  { background: var(--tw-sell-100); color: var(--tw-sell-700); }
+  .b-us    { background: var(--tw-navy-100); color: var(--tw-navy-800); }
+  .b-tw    { background: var(--tw-gold-100); color: var(--tw-gold-700); }
+  .b-limit { background: var(--tw-ink-100);  color: var(--tw-fg-2); }
+  .b-mkt   { background: var(--tw-ink-100);  color: var(--tw-fg-2); border: 1px dashed var(--tw-border-strong); }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font: 600 12px/1 var(--tw-font-sans);
+    padding: 5px 10px; border-radius: 999px; border: 1px solid;
+  }
+  .chip::before { content: ''; width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+  .c-pending  { background: var(--tw-status-pending-bg);  color: var(--tw-status-pending-fg);  border-color: var(--tw-status-pending-bd); }
+  .c-accepted { background: var(--tw-status-accepted-bg); color: var(--tw-status-accepted-fg); border-color: var(--tw-status-accepted-bd); }
+  .c-proc     { background: var(--tw-status-processing-bg); color: var(--tw-status-processing-fg); border-color: var(--tw-status-processing-bd); }
+  .c-filled   { background: var(--tw-status-filled-bg);   color: var(--tw-status-filled-fg);   border-color: var(--tw-status-filled-bd); }
+  .c-cancel   { background: var(--tw-status-cancelled-bg);color: var(--tw-status-cancelled-fg);border-color: var(--tw-status-cancelled-bd); }
+  .c-reject   { background: var(--tw-status-rejected-bg); color: var(--tw-status-rejected-fg); border-color: var(--tw-status-rejected-bd); }
+</style>
+</head>
+<body>
+<div class="head">Attribute badges</div>
+<div class="row">
+  <span class="badge b-buy">BUY</span>
+  <span class="badge b-sell">SELL</span>
+  <span class="badge b-us">US 美股</span>
+  <span class="badge b-tw">TW 台股</span>
+  <span class="badge b-limit">LIMIT 限價</span>
+  <span class="badge b-mkt">MARKET 市價</span>
+</div>
+<div class="head">Order status chips</div>
+<div class="row">
+  <span class="chip c-pending">待確認</span>
+  <span class="chip c-accepted">已接單</span>
+  <span class="chip c-proc">處理中</span>
+  <span class="chip c-filled">已完成</span>
+  <span class="chip c-cancel">已取消</span>
+  <span class="chip c-reject">已拒絕</span>
+</div>
+</body>
+</html>

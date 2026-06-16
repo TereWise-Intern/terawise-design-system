@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Data table row" subtitle="Back-office table styling — mono numerals, status chips" viewport="700x200" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Components · Data table row</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 16px 20px; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    font: 600 10px/1 var(--tw-font-sans);
+    letter-spacing: var(--tw-letter-overline); text-transform: uppercase;
+    color: var(--tw-fg-4); text-align: left; padding: 8px 10px;
+    border-bottom: 1px solid var(--tw-border);
+    background: var(--tw-navy-050);
+  }
+  th.r { text-align: right; }
+  td {
+    font: 500 13px/1.4 var(--tw-font-mono); color: var(--tw-fg-1);
+    padding: 10px; border-bottom: 1px solid var(--tw-border-subtle);
+    font-variant-numeric: tabular-nums;
+  }
+  td.r { text-align: right; }
+  td.l { font-family: var(--tw-font-sans); font-weight: 500; }
+  tr:hover td { background: var(--tw-ink-050); }
+  .sym { font-weight: 600; color: var(--tw-fg-1); }
+  .b { display: inline-flex; font: 600 10px/1 var(--tw-font-sans); padding: 3px 6px; border-radius: 2px; }
+  .b-buy  { background: var(--tw-buy-100);  color: var(--tw-buy-700); }
+  .b-sell { background: var(--tw-sell-100); color: var(--tw-sell-700); }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1 var(--tw-font-sans); padding: 4px 8px; border-radius: 999px; border: 1px solid; }
+  .chip::before { content: ''; width: 5px; height: 5px; border-radius: 999px; background: currentColor; }
+  .c-accepted { background: var(--tw-status-accepted-bg); color: var(--tw-status-accepted-fg); border-color: var(--tw-status-accepted-bd); }
+  .c-proc     { background: var(--tw-status-processing-bg); color: var(--tw-status-processing-fg); border-color: var(--tw-status-processing-bd); }
+  .c-filled   { background: var(--tw-status-filled-bg); color: var(--tw-status-filled-fg); border-color: var(--tw-status-filled-bd); }
+</style>
+</head>
+<body>
+<table>
+  <thead>
+    <tr>
+      <th>Order ID</th><th>客戶</th><th>Symbol</th><th>方向</th><th class="r">數量</th><th class="r">限價</th><th>狀態</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>OR-20250218-0142</td><td class="l">陳怡君</td><td><span class="sym">2330.TW</span></td>
+      <td><span class="b b-buy">BUY</span></td><td class="r">1,000</td><td class="r">1,135.00</td>
+      <td><span class="chip c-filled">已完成</span></td>
+    </tr>
+    <tr>
+      <td>OR-20250218-0143</td><td class="l">林啟瑞</td><td><span class="sym">AAPL</span></td>
+      <td><span class="b b-sell">SELL</span></td><td class="r">200</td><td class="r">227.50</td>
+      <td><span class="chip c-proc">處理中</span></td>
+    </tr>
+    <tr>
+      <td>OR-20250218-0144</td><td class="l">王志成</td><td><span class="sym">NVDA</span></td>
+      <td><span class="b b-buy">BUY</span></td><td class="r">50</td><td class="r">MKT</td>
+      <td><span class="chip c-accepted">已接單</span></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

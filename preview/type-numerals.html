@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Numerals (tabular mono)" subtitle="JetBrains Mono · prices, qty, P/L, IDs — always tabular" viewport="700x280" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Type · Numerals (mono, tabular)</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 24px; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); color: var(--tw-fg-1); }
+  .head {
+    font: var(--tw-text-overline); letter-spacing: var(--tw-letter-overline);
+    text-transform: uppercase; color: var(--tw-fg-4); margin-bottom: 14px;
+  }
+  .grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;
+    font-variant-numeric: tabular-nums; font-family: var(--tw-font-mono);
+  }
+  .stat .label { font: 500 11px/1.2 var(--tw-font-sans); color: var(--tw-fg-4); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat .v { font: var(--tw-text-num-xl); color: var(--tw-fg-1); }
+  .stat .delta { font: 600 13px/1 var(--tw-font-mono); margin-top: 6px; }
+  .up   { color: var(--tw-buy-700); }
+  .down { color: var(--tw-sell-700); }
+  table { border-collapse: collapse; width: 100%; font-family: var(--tw-font-mono); margin-top: 18px; }
+  th, td { text-align: right; padding: 4px 8px; font: 500 12px/1.4 var(--tw-font-mono); }
+  th { color: var(--tw-fg-4); font: 600 10px/1 var(--tw-font-sans); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--tw-border); }
+  td.sym { text-align: left; font-weight: 600; color: var(--tw-fg-1); }
+</style>
+</head>
+<body>
+<div class="head">Tabular numerals — JetBrains Mono</div>
+<div class="grid">
+  <div class="stat"><div class="label">S&amp;P 500</div><div class="v">6,038.81</div><div class="delta down">−14.40   −0.24%</div></div>
+  <div class="stat"><div class="label">加權指數</div><div class="v">23,235.92</div><div class="delta up">+402.18   +1.76%</div></div>
+  <div class="stat"><div class="label">10Y UST YIELD</div><div class="v">4.495 %</div><div class="delta down">−7.2 bp</div></div>
+</div>
+<table>
+  <tr><th class="sym" style="text-align:left">SYMBOL</th><th>LAST</th><th>CHG</th><th>%CHG</th><th>VOL</th></tr>
+  <tr><td class="sym">AAPL</td><td>227.63</td><td class="up">+0.84</td><td class="up">+0.37%</td><td>62,481,920</td></tr>
+  <tr><td class="sym">NVDA</td><td>129.84</td><td class="down">−2.41</td><td class="down">−1.83%</td><td>241,032,180</td></tr>
+  <tr><td class="sym">2330.TW</td><td>1,135.00</td><td class="up">+25.00</td><td class="up">+2.25%</td><td>34,210,500</td></tr>
+</table>
+</body>
+</html>

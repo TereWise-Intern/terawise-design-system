@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Spacing scale" subtitle="4 px base · 10 steps from 4 → 64 px" viewport="700x240" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Spacing scale</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 22px 24px; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); color: var(--tw-fg-2); }
+  .row {
+    display: grid; grid-template-columns: 50px 60px 1fr; gap: 16px;
+    align-items: center; padding: 5px 0;
+  }
+  .token { font: 600 12px/1 var(--tw-font-mono); color: var(--tw-fg-1); }
+  .px    { font: 500 12px/1 var(--tw-font-mono); color: var(--tw-fg-4); }
+  .bar {
+    height: 14px; background: var(--tw-navy-700); border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+  <div class="row"><div class="token">--1</div><div class="px">4 px</div><div class="bar" style="width:4px"></div></div>
+  <div class="row"><div class="token">--2</div><div class="px">8 px</div><div class="bar" style="width:8px"></div></div>
+  <div class="row"><div class="token">--3</div><div class="px">12 px</div><div class="bar" style="width:12px"></div></div>
+  <div class="row"><div class="token">--4</div><div class="px">16 px</div><div class="bar" style="width:16px"></div></div>
+  <div class="row"><div class="token">--5</div><div class="px">20 px</div><div class="bar" style="width:20px"></div></div>
+  <div class="row"><div class="token">--6</div><div class="px">24 px</div><div class="bar" style="width:24px"></div></div>
+  <div class="row"><div class="token">--7</div><div class="px">32 px</div><div class="bar" style="width:32px"></div></div>
+  <div class="row"><div class="token">--8</div><div class="px">40 px</div><div class="bar" style="width:40px"></div></div>
+  <div class="row"><div class="token">--9</div><div class="px">48 px</div><div class="bar" style="width:48px"></div></div>
+  <div class="row"><div class="token">--10</div><div class="px">64 px</div><div class="bar" style="width:64px"></div></div>
+</body>
+</html>

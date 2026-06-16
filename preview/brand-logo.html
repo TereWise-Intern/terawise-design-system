@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Logo lockup" subtitle="Primary mark on light + knock-out on navy" viewport="700x220" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Brand · Logo lockup</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); color: var(--tw-fg-3); }
+  .row {
+    display: grid; grid-template-columns: 1.6fr 1fr;
+    gap: 0; min-height: 220px;
+  }
+  .panel {
+    padding: 22px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  }
+  .panel + .panel { border-left: 1px solid var(--tw-border); }
+  .lab {
+    font: 600 10px/1 var(--tw-font-sans); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--tw-fg-4);
+  }
+  .cap { font: 500 10px/1.3 var(--tw-font-mono); color: var(--tw-fg-4); }
+  .light { background: var(--tw-ink-050); }
+  .lg img { max-height: 160px; display: block; }
+  .sm img { max-height: 80px; display: block; }
+</style>
+</head>
+<body>
+<div class="row">
+  <div class="panel light lg">
+    <div class="lab">Primary lockup</div>
+    <img src="../assets/logo.png" alt="TeraWise Capital">
+  </div>
+  <div class="panel sm">
+    <div class="lab">Compact</div>
+    <img src="../assets/logo.png" alt="TeraWise Capital">
+    <div class="cap">favicon · footer · printed confirmation</div>
+  </div>
+</div>
+</body>
+</html>

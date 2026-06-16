@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Buy / Sell semantic" subtitle="Market-aware: Western green-up, East-Asian red-up, KR/JP red-up blue-down" viewport="700x210" -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Colors · Market-aware up/down</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--tw-bg-canvas); font-family: var(--tw-font-sans); color: var(--tw-fg-2); }
+  .wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .col { padding: 18px 20px; border-right: 1px solid var(--tw-border-subtle); }
+  .col:last-child { border-right: 0; }
+  .col-head {
+    font: 600 10px/1 var(--tw-font-sans); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--tw-fg-4); margin-bottom: 10px;
+  }
+  .mkts { font: 500 11px/1.4 var(--tw-font-sans); color: var(--tw-fg-3); margin-bottom: 12px; }
+  .demo { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+  .swatch { display: flex; align-items: center; gap: 6px; font: 500 11px/1 var(--tw-font-mono); color: var(--tw-fg-3); }
+  .dot { width: 14px; height: 14px; border-radius: 3px; }
+  .chip { font: 600 12px/1 var(--tw-font-mono); padding: 4px 9px; border-radius: 2px; }
+  .chip-up-w   { background: var(--tw-green-100); color: var(--tw-green-700); }
+  .chip-dn-w   { background: var(--tw-red-100);   color: var(--tw-red-700); }
+  .chip-up-e   { background: var(--tw-red-100);   color: var(--tw-red-700); }
+  .chip-dn-e   { background: var(--tw-green-100); color: var(--tw-green-700); }
+  .chip-up-kr  { background: var(--tw-red-100);   color: var(--tw-red-700); }
+  .chip-dn-kr  { background: var(--tw-blue-dn-100); color: var(--tw-blue-dn-700); }
+  .btn-buy  { background: var(--tw-green-600); color: white; font: 600 12px/1 var(--tw-font-sans); padding: 6px 12px; border-radius: 4px; border: none; }
+  .btn-sell { background: var(--tw-red-600);   color: white; font: 600 12px/1 var(--tw-font-sans); padding: 6px 12px; border-radius: 4px; border: none; }
+  .rule { font: 400 11px/1.5 var(--tw-font-sans); color: var(--tw-fg-4); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--tw-border-subtle); }
+  .action-note { font: 600 11px/1 var(--tw-font-sans); color: var(--tw-fg-2); padding: 6px 10px; background: var(--tw-ink-050); border-radius: 3px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Western -->
+  <div class="col">
+    <div class="col-head">Western 西方</div>
+    <div class="mkts">US · UK · EU · CA · AU · IN</div>
+    <div class="demo">
+      <span class="chip chip-up-w">+1.76%</span>
+      <span class="chip chip-dn-w">−0.24%</span>
+    </div>
+    <div class="demo">
+      <div class="swatch"><div class="dot" style="background:var(--tw-green-600)"></div> UP</div>
+      <div class="swatch"><div class="dot" style="background:var(--tw-red-600)"></div> DOWN</div>
+    </div>
+    <div class="rule">綠漲紅跌 · Green up / Red down</div>
+  </div>
+
+  <!-- East-Asian -->
+  <div class="col">
+    <div class="col-head">East Asian 東亞</div>
+    <div class="mkts">TW · CN · HK · SG</div>
+    <div class="demo">
+      <span class="chip chip-up-e">+1.76%</span>
+      <span class="chip chip-dn-e">−0.24%</span>
+    </div>
+    <div class="demo">
+      <div class="swatch"><div class="dot" style="background:var(--tw-red-600)"></div> UP</div>
+      <div class="swatch"><div class="dot" style="background:var(--tw-green-600)"></div> DOWN</div>
+    </div>
+    <div class="rule">紅漲綠跌 · Red up / Green down</div>
+  </div>
+
+  <!-- KR / JP -->
+  <div class="col">
+    <div class="col-head">KR / JP 韓日</div>
+    <div class="mkts">JP · KR</div>
+    <div class="demo">
+      <span class="chip chip-up-kr">+1.76%</span>
+      <span class="chip chip-dn-kr">−0.24%</span>
+    </div>
+    <div class="demo">
+      <div class="swatch"><div class="dot" style="background:var(--tw-red-600)"></div> UP</div>
+      <div class="swatch"><div class="dot" style="background:var(--tw-blue-dn-600)"></div> DOWN</div>
+    </div>
+    <div class="rule">紅漲藍跌 · Red up / Blue down</div>
+  </div>
+
+</div>
+<!-- BUY/SELL action buttons are ALWAYS green/red regardless of market -->
+<div style="padding: 14px 20px; border-top: 1px solid var(--tw-border-subtle); display: flex; gap: 14px; align-items: center;">
+  <span style="font: 600 10px/1 var(--tw-font-sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--tw-fg-4);">Action buttons (market-invariant)</span>
+  <button class="btn-buy">買進 BUY</button>
+  <button class="btn-sell">賣出 SELL</button>
+  <span style="font: 400 11px/1.4 var(--tw-font-sans); color: var(--tw-fg-4);">BUY / SELL 按鈕顏色不隨市場改變；只有漲跌幅數字依市場切換。</span>
+</div>
+</body>
+</html>
