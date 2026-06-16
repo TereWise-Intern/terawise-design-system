@@ -134,12 +134,14 @@ function ClientDetailDrawer({ client, onClose, onUpdateClient }) {
   const [newAcct, setNewAcct] = useState('');
   const [banks, setBanks] = useState([]);
   const [newBank, setNewBank] = useState('');
+  const [bankMap, setBankMap] = useState({});
   const [holder, setHolder] = useState('');
   const [holderEditing, setHolderEditing] = useState(false);
 
   useEffect(() => {
     setAccts(client?.accounts || []);
     setBanks(client?.order_banks || []);
+    setBankMap(client?.account_bank_map || {});
     setHolder(client?.account_holder || '');
     setHolderEditing(false);
     setNewAcct('');
@@ -161,7 +163,21 @@ function ClientDetailDrawer({ client, onClose, onUpdateClient }) {
     await sb.from('clients').update({ accounts: list }).eq('id', client.id);
   };
   const addAcct = () => { const v = newAcct.trim(); if (v && !accts.includes(v)) { saveAccts([...accts, v]); setNewAcct(''); } };
-  const removeAcct = (a) => saveAccts(accts.filter(x => x !== a));
+  const removeAcct = (a) => {
+    saveAccts(accts.filter(x => x !== a));
+    if (bankMap[a]) { const next = { ...bankMap }; delete next[a]; saveBankMap(next); }
+  };
+
+  const saveBankMap = async (map) => {
+    setBankMap(map);
+    if (onUpdateClient) onUpdateClient(client.id, { account_bank_map: map });
+    await sb.from('clients').update({ account_bank_map: map }).eq('id', client.id);
+  };
+  const setAcctBank = (acct, bank) => {
+    const next = { ...bankMap };
+    if (bank) next[acct] = bank; else delete next[acct];
+    saveBankMap(next);
+  };
 
   const saveBanks = async (list) => {
     setBanks(list);
@@ -169,7 +185,12 @@ function ClientDetailDrawer({ client, onClose, onUpdateClient }) {
     await sb.from('clients').update({ order_banks: list }).eq('id', client.id);
   };
   const addBank = () => { const v = newBank.trim(); if (v && !banks.includes(v)) { saveBanks([...banks, v]); setNewBank(''); } };
-  const removeBank = (b) => saveBanks(banks.filter(x => x !== b));
+  const removeBank = (b) => {
+    saveBanks(banks.filter(x => x !== b));
+    const next = {};
+    Object.entries(bankMap).forEach(([acct, bank]) => { if (bank !== b) next[acct] = bank; });
+    if (Object.keys(next).length !== Object.keys(bankMap).length) saveBankMap(next);
+  };
 
   return (
     <>
@@ -230,36 +251,10 @@ function ClientDetailDrawer({ client, onClose, onUpdateClient }) {
                 )}
               </div>
 
-              <div className="bo-section-h">下單帳號 Trading Accounts</div>
-              <div style={{ marginBottom: 20 }}>
-                {accts.length === 0 && (
-                  <div style={{ font: '400 12px/1.5 var(--tw-font-sans)', color: 'var(--tw-fg-4)', marginBottom: 8 }}>尚未設定任何下單帳號。客戶須有至少一個帳號才能委託。</div>
-                )}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
-                  {accts.map(a => (
-                    <span key={a} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 8px 6px 12px', background: 'var(--tw-ink-050)', border: '1px solid var(--tw-border)', borderRadius: 4, font: '600 12px/1 var(--tw-font-mono)', color: 'var(--tw-fg-1)' }}>
-                      {a}
-                      <button onClick={() => removeAcct(a)} title="移除帳號"
-                        style={{ display: 'grid', placeItems: 'center', width: 18, height: 18, border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--tw-fg-4)', borderRadius: 3 }}>
-                        <Icon name="x" size={13} />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <input value={newAcct} onChange={e => setNewAcct(e.target.value)} placeholder="新增帳號，例如 U1234567"
-                    onKeyDown={e => e.key === 'Enter' && addAcct()}
-                    style={{ flex: 1, padding: '8px 10px', borderRadius: 4, border: '1px solid var(--tw-border)', background: 'white', font: '400 13px/1 var(--tw-font-mono)', color: 'var(--tw-fg-1)', outline: 'none', boxSizing: 'border-box' }} />
-                  <button className="bo-btn bo-btn--secondary" onClick={addAcct} disabled={!newAcct.trim()}>
-                    <Icon name="plus" size={13} /> 新增
-                  </button>
-                </div>
-              </div>
-
               <div className="bo-section-h">下單銀行 Order Banks</div>
               <div style={{ marginBottom: 20 }}>
                 {banks.length === 0 && (
-                  <div style={{ font: '400 12px/1.5 var(--tw-font-sans)', color: 'var(--tw-fg-4)', marginBottom: 8 }}>尚未設定下單銀行。客戶下單時將從這些銀行中選擇。</div>
+                  <div style={{ font: '400 12px/1.5 var(--tw-font-sans)', color: 'var(--tw-fg-4)', marginBottom: 8 }}>尚未設定下單銀行。請先新增銀行，再到下方將帳號綁定至對應銀行。</div>
                 )}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
                   {banks.map(b => (
@@ -277,6 +272,42 @@ function ClientDetailDrawer({ client, onClose, onUpdateClient }) {
                     onKeyDown={e => e.key === 'Enter' && addBank()}
                     style={{ flex: 1, padding: '8px 10px', borderRadius: 4, border: '1px solid var(--tw-border)', background: 'white', font: '400 13px/1 var(--tw-font-sans)', color: 'var(--tw-fg-1)', outline: 'none', boxSizing: 'border-box' }} />
                   <button className="bo-btn bo-btn--secondary" onClick={addBank} disabled={!newBank.trim()}>
+                    <Icon name="plus" size={13} /> 新增
+                  </button>
+                </div>
+              </div>
+
+              <div className="bo-section-h">下單帳號 Trading Accounts</div>
+              <div style={{ marginBottom: 20 }}>
+                {accts.length === 0 && (
+                  <div style={{ font: '400 12px/1.5 var(--tw-font-sans)', color: 'var(--tw-fg-4)', marginBottom: 8 }}>尚未設定任何下單帳號。客戶須有至少一個帳號才能委託。</div>
+                )}
+                {accts.length > 0 && (
+                  <div style={{ font: '400 11px/1.4 var(--tw-font-sans)', color: 'var(--tw-fg-4)', marginBottom: 10 }}>每個帳號可綁定一個下單銀行；客戶選擇帳號時將自動帶入對應銀行。</div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 }}>
+                  {accts.map(a => (
+                    <div key={a} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 8px 7px 12px', background: 'var(--tw-ink-050)', border: '1px solid var(--tw-border)', borderRadius: 4 }}>
+                      <span style={{ font: '600 12px/1 var(--tw-font-mono)', color: 'var(--tw-fg-1)', minWidth: 92 }}>{a}</span>
+                      <Icon name="arrow-right" size={13} style={{ color: 'var(--tw-fg-4)', flexShrink: 0 }} />
+                      <select value={bankMap[a] || ''} onChange={e => setAcctBank(a, e.target.value)}
+                        style={{ flex: 1, padding: '6px 8px', borderRadius: 4, border: '1px solid var(--tw-border)', background: 'white', font: '500 12px/1 var(--tw-font-sans)', color: bankMap[a] ? 'var(--tw-fg-1)' : 'var(--tw-fg-4)', outline: 'none', cursor: banks.length ? 'pointer' : 'not-allowed' }}
+                        disabled={banks.length === 0}>
+                        <option value="">{banks.length ? '— 選擇綁定銀行 —' : '請先新增下單銀行'}</option>
+                        {banks.map(b => <option key={b} value={b}>{b}</option>)}
+                      </select>
+                      <button onClick={() => removeAcct(a)} title="移除帳號"
+                        style={{ display: 'grid', placeItems: 'center', width: 22, height: 22, border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--tw-fg-4)', borderRadius: 3, flexShrink: 0 }}>
+                        <Icon name="x" size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input value={newAcct} onChange={e => setNewAcct(e.target.value)} placeholder="新增帳號，例如 U1234567"
+                    onKeyDown={e => e.key === 'Enter' && addAcct()}
+                    style={{ flex: 1, padding: '8px 10px', borderRadius: 4, border: '1px solid var(--tw-border)', background: 'white', font: '400 13px/1 var(--tw-font-mono)', color: 'var(--tw-fg-1)', outline: 'none', boxSizing: 'border-box' }} />
+                  <button className="bo-btn bo-btn--secondary" onClick={addAcct} disabled={!newAcct.trim()}>
                     <Icon name="plus" size={13} /> 新增
                   </button>
                 </div>

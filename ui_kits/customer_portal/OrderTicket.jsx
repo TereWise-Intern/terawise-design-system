@@ -28,7 +28,7 @@ function getDefaultTradeDate() {
   return `${d.getFullYear()}-${String(m).padStart(2,'0')}-${String(dt).padStart(2,'0')}`;
 }
 
-function OrderTicket({ initial, onCancel, onSubmit, clientId, clientName, accounts = [], orderBanks = [] }) {
+function OrderTicket({ initial, onCancel, onSubmit, clientId, clientName, accounts = [], orderBanks = [], accountBankMap = {} }) {
   const [step, setStep] = useState(0);
   const [ticket, setTicket] = useState({
     market: 'US', symbol: 'AAPL',
@@ -36,7 +36,7 @@ function OrderTicket({ initial, onCancel, onSubmit, clientId, clientName, accoun
     qty: 100, price: '',
     trade_date: getDefaultTradeDate(),
     account: accounts[0] || '',
-    order_bank: orderBanks[0] || '',
+    order_bank: (accounts[0] && accountBankMap[accounts[0]]) || orderBanks[0] || '',
     ...initial,
   });
   const update = (patch) => setTicket(t => ({ ...t, ...patch }));
@@ -74,7 +74,7 @@ function OrderTicket({ initial, onCancel, onSubmit, clientId, clientName, accoun
             <div className="tw-card__sub">STEP {step + 1} / {STEP_LABELS.length}</div>
           </div>
           <div className="tw-card__body">
-            {step === 0 && <StepMarketSymbol ticket={ticket} update={update} accounts={accounts} orderBanks={orderBanks} />}
+            {step === 0 && <StepMarketSymbol ticket={ticket} update={update} accounts={accounts} orderBanks={orderBanks} accountBankMap={accountBankMap} />}
             {step === 1 && <StepSideType ticket={ticket} update={update} />}
             {step === 2 && <StepQtyPrice ticket={ticket} update={update} quote={quote} />}
             {step === 3 && <StepConfirm ticket={ticket} quote={quote} estimate={estimate} clientName={clientName} />}
@@ -98,9 +98,10 @@ function OrderTicket({ initial, onCancel, onSubmit, clientId, clientName, accoun
 }
 
 // ---------- Step 0: market + symbol ----------
-function StepMarketSymbol({ ticket, update, accounts = [], orderBanks = [] }) {
+function StepMarketSymbol({ ticket, update, accounts = [], orderBanks = [], accountBankMap = {} }) {
   const [customMarket, setCustomMarket] = useState('');
   const [showCustom, setShowCustom] = useState(false);
+  const boundBank = accountBankMap[ticket.account];
 
   const handleMarketClick = (code) => {
     if (code === '__other__') { setShowCustom(true); return; }
@@ -125,7 +126,7 @@ function StepMarketSymbol({ ticket, update, accounts = [], orderBanks = [] }) {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {accounts.map(a => (
               <button key={a}
-                onClick={() => update({ account: a })}
+                onClick={() => { const bound = accountBankMap[a]; update(bound ? { account: a, order_bank: bound } : { account: a }); }}
                 className={`tw-btn tw-btn--sm ${ticket.account === a ? 'tw-btn--primary' : 'tw-btn--secondary'}`}
                 style={{ fontFamily: 'var(--tw-font-mono)', fontWeight: 600, padding: '9px 14px', height: 'auto', ...(ticket.account === a ? { boxShadow: '0 0 0 2px var(--tw-navy-800)' } : {}) }}>
                 {a}
@@ -144,8 +145,20 @@ function StepMarketSymbol({ ticket, update, accounts = [], orderBanks = [] }) {
         )}
       </Field>
 
-      <Field label="下單銀行 Order Bank" required hint="選擇本次委託的下單銀行">
-        {orderBanks.length > 0 ? (
+      <Field label="下單銀行 Order Bank" required hint={boundBank ? '已依所選帳號自動帶入，無需手動選擇' : '選擇本次委託的下單銀行'}>
+        {boundBank ? (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+            background: 'var(--tw-navy-050)', border: '1px solid var(--tw-navy-100)',
+            borderRadius: 4, padding: '10px 12px'
+          }}>
+            <Icon name="link" size={15} color="var(--tw-navy-700)" />
+            <span style={{ font: '600 14px/1 var(--tw-font-sans)', color: 'var(--tw-fg-1)' }}>{boundBank}</span>
+            <span style={{ font: '500 11px/1 var(--tw-font-sans)', color: 'var(--tw-fg-4)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              已綁定帳號 <span style={{ fontFamily: 'var(--tw-font-mono)' }}>{ticket.account}</span>
+            </span>
+          </div>
+        ) : orderBanks.length > 0 ? (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {orderBanks.map(b => (
               <button key={b}

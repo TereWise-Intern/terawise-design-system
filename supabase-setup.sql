@@ -37,6 +37,7 @@ create table if not exists public.clients (
   phone       text,
   accounts    text[] default '{}',   -- 下單帳號（可多個券商交割帳號）
   order_banks text[] default '{}',   -- 下單銀行（可多個）
+  account_bank_map jsonb default '{}'::jsonb,  -- 帳號→銀行綁定：{"U1234567":"中國信託"}
   status      text default 'active' check (status in ('active', 'inactive')),
   created_at  timestamptz default now(),
   last_login  timestamptz
@@ -119,6 +120,7 @@ create trigger orders_updated_at before update on public.orders
 alter table public.clients add column if not exists accounts      text[] default '{}';
 alter table public.clients add column if not exists account_holder text;
 alter table public.clients add column if not exists order_banks   text[] default '{}';
+alter table public.clients add column if not exists account_bank_map jsonb default '{}'::jsonb;
 alter table public.orders  add column if not exists account        text;
 alter table public.orders  add column if not exists order_bank     text;
 alter table public.orders  add column if not exists trade_date     date;

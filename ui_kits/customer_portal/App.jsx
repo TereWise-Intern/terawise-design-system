@@ -174,6 +174,7 @@ function App() {
             clientName={client.account_holder || client.name}
             accounts={client.accounts || []}
             orderBanks={client.order_banks || []}
+            accountBankMap={client.account_bank_map || {}}
             onCancel={() => setRoute('dashboard')}
             onSubmit={submit} />
         )}
