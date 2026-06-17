@@ -34,6 +34,7 @@ function App() {
   const [orders,      setOrders]      = useState([]);
   const [authLoading, setAuthLoading] = useState(true);
   const [route,       setRoute]       = useState('dashboard');
+  const [editing,     setEditing]     = useState(null);
   const [toast,       setToast]       = useState(null);
 
   // ── Auth ──
@@ -98,9 +99,39 @@ function App() {
     return () => sb.removeChannel(channel);
   }, [client?.id]);
 
-  // ── Submit order ──
+  // ── Submit order (new) or save changes (modify) ──
   const submit = async (ticket) => {
     if (!client) return;
+    const fields = {
+      account:     ticket.account || null,
+      order_bank:  ticket.order_bank || null,
+      sym:         ticket.symbol,
+      market:      ticket.market,
+      side:        ticket.side,
+      type:        ticket.type,
+      custom_type: ticket.type === 'custom' ? (String(ticket.custom_type || '').trim() || null) : null,
+      time_in_force: ticket.tif || 'rod',
+      qty:         Number(ticket.qty),
+      price:       ticket.type === 'limit' ? Number(ticket.price) : null,
+      trade_date:  ticket.trade_date || null,
+    };
+
+    // ── Modify an existing order — only while still pending (接單前) ──
+    if (editing) {
+      const { error } = await sb.from('orders')
+        .update(fields).eq('id', editing.id).eq('status', 'pending');
+      setEditing(null);
+      if (!error) {
+        await fetchOrders(client.id);
+        showToast('委託已更新。');
+        setRoute('dashboard');
+      } else {
+        showToast('更新失敗：' + error.message);
+      }
+      return;
+    }
+
+    // ── New order ──
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
     const orderId = `OR-${date}-${rand}`;
@@ -108,18 +139,9 @@ function App() {
       id:          orderId,
       client_id:   client.id,
       client_name: client.account_holder || profile?.display_name || client.name,
-      account:     ticket.account || null,
-      order_bank:  ticket.order_bank || null,
-      sym:         ticket.symbol,
-      market:      ticket.market,
-      side:        ticket.side,
-      type:        ticket.type,
-      time_in_force: ticket.tif || 'rod',
-      qty:         Number(ticket.qty),
-      price:       ticket.type === 'limit' ? Number(ticket.price) : null,
-      trade_date:  ticket.trade_date || null,
       status:      'pending',
       note:        '',
+      ...fields,
     });
     if (!error) {
       await fetchOrders(client.id); // force immediate refresh
@@ -128,6 +150,25 @@ function App() {
     } else {
       showToast('送出失敗：' + error.message);
     }
+  };
+
+  // ── Cancel an order — client self-service, only before back-office accepts (pending) ──
+  const cancelOrder = async (order) => {
+    if (!client || !order) return;
+    const { error } = await sb.from('orders')
+      .update({ status: 'cancelled' }).eq('id', order.id).eq('status', 'pending');
+    if (!error) {
+      await fetchOrders(client.id);
+      showToast(`委託 ${order.id} 已取消。`);
+    } else {
+      showToast('取消失敗：' + error.message);
+    }
+  };
+
+  // ── Begin modifying an order — open the ticket pre-filled ──
+  const startModify = (order) => {
+    setEditing(order);
+    setRoute('order');
   };
 
   const showToast = (msg) => {
@@ -166,7 +207,9 @@ function App() {
           <Dashboard
             userName={profile.display_name || client.name}
             orders={orders}
-            onPlaceOrder={() => setRoute('order')} />
+            onPlaceOrder={() => { setEditing(null); setRoute('order'); }}
+            onCancelOrder={cancelOrder}
+            onModifyOrder={startModify} />
         )}
         {route === 'order' && (
           <OrderTicket
@@ -175,7 +218,17 @@ function App() {
             accounts={client.accounts || []}
             orderBanks={client.order_banks || []}
             accountBankMap={client.account_bank_map || {}}
-            onCancel={() => setRoute('dashboard')}
+            isEdit={!!editing}
+            initial={editing ? {
+              market: editing.market, symbol: editing.sym, side: editing.side,
+              type: editing.type, custom_type: editing.custom_type || '',
+              tif: editing.time_in_force || 'rod', qty: editing.qty,
+              price: editing.price != null ? editing.price : '',
+              account: editing.account || undefined,
+              order_bank: editing.order_bank || undefined,
+              trade_date: editing.trade_date || undefined,
+            } : undefined}
+            onCancel={() => { setEditing(null); setRoute('dashboard'); }}
             onSubmit={submit} />
         )}
       </main>

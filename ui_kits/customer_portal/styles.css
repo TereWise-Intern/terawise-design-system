@@ -191,6 +191,7 @@ button { font-family: inherit; }
 .tw-badge--us    { background: var(--tw-navy-100); color: var(--tw-navy-800); }
 .tw-badge--tw    { background: var(--tw-gold-100); color: var(--tw-gold-700); }
 .tw-badge--neutral { background: var(--tw-ink-100); color: var(--tw-fg-2); }
+.tw-badge--gold  { background: var(--tw-gold-100); color: var(--tw-gold-700); }
 
 /* ---------- Tabular numbers ---------- */
 .tw-num {

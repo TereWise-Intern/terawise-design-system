@@ -28,16 +28,20 @@ function getDefaultTradeDate() {
   return `${d.getFullYear()}-${String(m).padStart(2,'0')}-${String(dt).padStart(2,'0')}`;
 }
 
-function OrderTicket({ initial, onCancel, onSubmit, clientId, clientName, accounts = [], orderBanks = [], accountBankMap = {} }) {
+function OrderTicket({ initial, isEdit = false, onCancel, onSubmit, clientId, clientName, accounts = [], orderBanks = [], accountBankMap = {} }) {
   const [step, setStep] = useState(0);
-  const [ticket, setTicket] = useState({
-    market: 'US', symbol: 'AAPL',
-    side: 'buy', type: 'limit', tif: 'rod',
-    qty: 100, price: '',
-    trade_date: getDefaultTradeDate(),
-    account: accounts[0] || '',
-    order_bank: (accounts[0] && accountBankMap[accounts[0]]) || orderBanks[0] || '',
-    ...initial,
+  const [ticket, setTicket] = useState(() => {
+    const base = {
+      market: 'US', symbol: 'AAPL',
+      side: 'buy', type: 'limit', tif: 'rod',
+      qty: 100, price: '', custom_type: '',
+      trade_date: getDefaultTradeDate(),
+      account: accounts[0] || '',
+      order_bank: (accounts[0] && accountBankMap[accounts[0]]) || orderBanks[0] || '',
+    };
+    // Merge in an order being modified, ignoring null/undefined so defaults survive
+    if (initial) for (const k in initial) if (initial[k] !== undefined && initial[k] !== null) base[k] = initial[k];
+    return base;
   });
   const update = (patch) => setTicket(t => ({ ...t, ...patch }));
   const quote = useMemo(() => findSym(ticket.symbol), [ticket.symbol]);
@@ -52,6 +56,7 @@ function OrderTicket({ initial, onCancel, onSubmit, clientId, clientName, accoun
   const needPrice = TYPE_NEEDS_PRICE(ticket.type);
   const stepValid =
     step === 0 ? !!ticket.account && !!String(ticket.symbol).trim() && !!ticket.order_bank :
+    step === 1 ? (ticket.type !== 'custom' || !!String(ticket.custom_type || '').trim()) :
     step === 2 ? Number(ticket.qty) > 0 && (!needPrice || Number(ticket.price) > 0) :
     true;
 
@@ -59,10 +64,10 @@ function OrderTicket({ initial, onCancel, onSubmit, clientId, clientName, accoun
     <div>
       <div className="tw-page-head">
         <div>
-          <h1>建立委託 New order</h1>
-          <div className="tw-page-head__sub">送出前將顯示確認頁面，避免誤送。</div>
+          <h1>{isEdit ? '修改委託 Modify order' : '建立委託 New order'}</h1>
+          <div className="tw-page-head__sub">{isEdit ? '此委託尚未接單，可調整內容後重新送出。' : '送出前將顯示確認頁面，避免誤送。'}</div>
         </div>
-        <Button variant="ghost" icon="x" onClick={onCancel}>取消下單</Button>
+        <Button variant="ghost" icon="x" onClick={onCancel}>{isEdit ? '放棄修改' : '取消下單'}</Button>
       </div>
 
       <Steps items={STEP_LABELS} current={step} />
@@ -85,7 +90,7 @@ function OrderTicket({ initial, onCancel, onSubmit, clientId, clientName, accoun
             {step === 3 && (
               <Button variant={ticket.side === 'buy' ? 'buy' : 'sell'} size="lg"
                 onClick={() => onSubmit(ticket)}>
-                確認送出 · {ticket.side === 'buy' ? '買進' : '賣出'}
+                {isEdit ? '確認修改 · ' : '確認送出 · '}{ticket.side === 'buy' ? '買進' : '賣出'}
               </Button>
             )}
           </div>
@@ -269,15 +274,33 @@ function StepSideType({ ticket, update }) {
           ]}
           value={ticket.side} onChange={(v) => update({ side: v })} />
       </Field>
-      <Field label="委託類型 Order type" required hint="限價單於指定價格或更佳成交；市價單以最佳價格立即成交；開盤／收盤價於當日集合競價成交">
+      <Field label="委託類型 Order type" required hint="限價單於指定價格或更佳成交；市價單以最佳價格立即成交；開盤／收盤價於當日集合競價成交；自訂可輸入特殊指示">
         <Segmented
           options={[
             { value: 'limit',    label: '限價' },
             { value: 'market',   label: '市價' },
             { value: 'at_open',  label: '開盤價' },
             { value: 'at_close', label: '收盤價' },
+            { value: 'custom',   label: '自訂' },
           ]}
           value={ticket.type} onChange={(v) => update({ type: v })} />
+        {ticket.type === 'custom' && (
+          <div style={{ marginTop: 10 }}>
+            <input className="tw-input"
+              value={ticket.custom_type || ''}
+              onChange={e => update({ custom_type: e.target.value })}
+              placeholder="輸入委託指示，例如：停損 168 觸發、分批買進、限 VWAP 區間" />
+            <div style={{
+              marginTop: 8, display: 'flex', gap: 10, alignItems: 'flex-start',
+              background: 'var(--tw-navy-050)', border: '1px solid var(--tw-navy-100)',
+              borderRadius: 4, padding: '10px 12px',
+              font: 'var(--tw-text-small)', color: 'var(--tw-fg-2)'
+            }}>
+              <Icon name="info" size={15} color="var(--tw-navy-500)" style={{ marginTop: 1 }} />
+              <div>自訂委託將以文字說明送至後台，由專員人工確認後執行；如需限定價格請於說明中註明。</div>
+            </div>
+          </div>
+        )}
       </Field>
       <Field label="委託效期 Time in force" required hint="ROD 當日有效；IOC 立即成交否則取消；FOK 全部成交否則取消">
         <Segmented
@@ -295,8 +318,8 @@ function StepSideType({ ticket, update }) {
       }}>
         <Icon name="info" size={16} color="var(--tw-navy-500)" style={{ marginTop: 1 }} />
         <div>
-          委託送出後僅<strong>後台人員</strong>可協助取消，客戶端暫不開放自助取消。
-          如需取消請聯繫專員。
+          委託送出後、<strong>後台接單前</strong>，您可於「委託紀錄」自行取消或修改；
+          一旦已接單則無法自助取消，請聯繫專員。
         </div>
       </div>
     </div>
@@ -376,7 +399,7 @@ function StepConfirm({ ticket, quote, estimate, clientName }) {
       }}>
         <Icon name="alert-triangle" size={16}
           color={ticket.side === 'buy' ? 'var(--tw-buy-700)' : 'var(--tw-sell-700)'} />
-        <div>請仔細核對下方委託內容。送出後將提交至後台處理，<strong>無法由客戶端自行取消</strong>。</div>
+        <div>請仔細核對下方委託內容。送出後在<strong>後台接單前</strong>仍可自行取消或修改。</div>
       </div>
       <div className="tw-kv">
         <div className="tw-kv__k">戶名</div>
@@ -399,7 +422,7 @@ function StepConfirm({ ticket, quote, estimate, clientName }) {
         <div className="tw-kv__k">數量</div>
         <div className="tw-kv__v">{Number(ticket.qty).toLocaleString()} 股</div>
         <div className="tw-kv__k">委託類型</div>
-        <div className="tw-kv__v is-sans"><Badge tone="neutral">{ORDER_TYPE_LABEL[ticket.type] || ticket.type}</Badge></div>
+        <div className="tw-kv__v is-sans"><Badge tone={ticket.type === 'custom' ? 'gold' : 'neutral'}>{orderTypeLabel(ticket)}</Badge></div>
         <div className="tw-kv__k">委託效期</div>
         <div className="tw-kv__v is-sans"><Badge tone="neutral">{TIF_LABEL[ticket.tif || 'rod']}</Badge></div>
         {TYPE_NEEDS_PRICE(ticket.type) && (
@@ -467,7 +490,7 @@ function SidePreview({ ticket, quote, estimate, step, clientName }) {
           <div className="tw-kv__k">股票</div>
           <div className="tw-kv__v">{ticket.symbol || '—'}</div>
           <div className="tw-kv__k">類型</div>
-          <div className="tw-kv__v is-sans">{ORDER_TYPE_SHORT[ticket.type] || ticket.type}</div>
+          <div className="tw-kv__v is-sans">{orderTypeShort(ticket)}</div>
           <div className="tw-kv__k">效期</div>
           <div className="tw-kv__v is-sans">{TIF_SHORT[ticket.tif || 'rod']}</div>
           <div className="tw-kv__k">數量</div>

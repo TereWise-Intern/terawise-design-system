@@ -100,6 +100,7 @@
   .m-chip-accepted   { background: var(--tw-status-accepted-bg);   color: var(--tw-status-accepted-fg);   border-color: var(--tw-status-accepted-bd); }
   .m-chip-filled     { background: var(--tw-status-filled-bg);     color: var(--tw-status-filled-fg);     border-color: var(--tw-status-filled-bd); }
   .m-chip-rejected   { background: var(--tw-status-rejected-bg);   color: var(--tw-status-rejected-fg);   border-color: var(--tw-status-rejected-bd); }
+  .m-chip-cancelled  { background: var(--tw-ink-100); color: var(--tw-fg-3); border-color: var(--tw-border-strong); }
 
   /* Order row */
   .m-order-row { padding: 13px 16px; border-top: 1px solid var(--tw-border-subtle); display: flex; align-items: center; gap: 10px; }
@@ -173,7 +174,7 @@ function BrandMark({ size = 26 }) {
   );
 }
 
-const STATUS_LABEL = { pending: '送出委託', accepted: '已接單', filled: '完成', rejected: '失敗' };
+const STATUS_LABEL = { pending: '送出委託', accepted: '已接單', filled: '完成', rejected: '失敗', cancelled: '已取消' };
 const MARKETS = ['US','TW','CN','HK','JP','KR','UK','EU','CA','AU','SG','IN'];
 const MARKET_CCY = { TW:'NT$', US:'US$', CN:'¥', HK:'HK$', JP:'¥', KR:'₩', UK:'£', EU:'€', CA:'C$', AU:'A$', SG:'S$', IN:'₹' };
 const MARKET_NAME = { TW:'台股', US:'美股', CN:'中國 A 股', HK:'港股', JP:'日股', KR:'韓股', UK:'英股', EU:'歐股', CA:'加股', AU:'澳股', SG:'新股', IN:'印股' };
@@ -231,7 +232,7 @@ function TabBar({ tab, setTab }) {
 }
 
 // ── Home Screen ──
-function HomeScreen({ userName, onTrade }) {
+function HomeScreen({ userName, orders, onCancel, onModify }) {
   return (
     <div className="m-content">
       <div style={{ padding: '16px 16px 4px' }}>
@@ -259,8 +260,8 @@ function HomeScreen({ userName, onTrade }) {
       {/* Orders */}
       <div className="m-section-h">委託紀錄 Orders</div>
       <div className="m-card">
-        {ORDERS.map((o, i) => (
-          <div key={o.id} className="m-order-row" style={i === 0 ? { borderTop: 'none' } : {}}>
+        {orders.map((o, i) => (
+          <div key={o.id} className="m-order-row" style={{ alignItems: 'flex-start', ...(i === 0 ? { borderTop: 'none' } : {}) }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
                 <div className="m-order-sym">{o.sym}</div>
@@ -270,6 +271,12 @@ function HomeScreen({ userName, onTrade }) {
               <div className="m-order-meta">
                 {o.t} · {o.qty.toLocaleString()} 股 · {o.price ? '@' + o.price : 'MKT'}
               </div>
+              {o.status === 'pending' && (
+                <div style={{ display: 'flex', gap: 8, marginTop: 9 }}>
+                  <button className="m-act-btn" style={{ background: 'var(--tw-ink-100)', color: 'var(--tw-fg-1)' }} onClick={() => onModify(o)}>修改</button>
+                  <button className="m-act-btn" style={{ background: 'var(--tw-sell-100)', color: 'var(--tw-sell-700)' }} onClick={() => onCancel(o)}>取消</button>
+                </div>
+              )}
             </div>
             <span className={`m-chip m-chip-${o.status}`}>{STATUS_LABEL[o.status]}</span>
           </div>
@@ -281,15 +288,17 @@ function HomeScreen({ userName, onTrade }) {
 }
 
 // ── Trade Screen ──
-function TradeScreen({ onSubmit }) {
+function TradeScreen({ initial, onSave }) {
+  const isEdit = !!initial;
   const [step, setStep] = useState(0);
-  const [market, setMarket] = useState('US');
-  const [sym, setSym] = useState('AAPL');
-  const [side, setSide] = useState('buy');
-  const [type, setType] = useState('limit');
-  const [tif, setTif] = useState('rod');
-  const [qty, setQty] = useState('100');
-  const [price, setPrice] = useState('227.50');
+  const [market, setMarket] = useState(initial?.market || 'US');
+  const [sym, setSym] = useState(initial?.sym || 'AAPL');
+  const [side, setSide] = useState(initial?.side || 'buy');
+  const [type, setType] = useState(initial?.type || 'limit');
+  const [tif, setTif] = useState(initial?.time_in_force || 'rod');
+  const [qty, setQty] = useState(String(initial?.qty ?? '100'));
+  const [price, setPrice] = useState(String(initial?.price ?? '227.50'));
+  const [customType, setCustomType] = useState(initial?.custom_type || '');
   const [done, setDone] = useState(false);
 
   if (done) return (
@@ -312,8 +321,8 @@ function TradeScreen({ onSubmit }) {
 
   const steps = ['市場 / 股票', '買賣 / 類型', '數量 / 限價', '確認送出'];
   const estimate = (Number(qty) || 0) * (type === 'limit' ? (Number(price) || 0) : 228);
-  const TYPE_LBL = { limit: '限價 LIMIT', market: '市價 MARKET', at_open: '開盤價 @market open price', at_close: '收盤價 @market close price' };
-  const TYPE_SHORT = { limit: '限價', market: '市價', at_open: '@market open', at_close: '@market close' };
+  const TYPE_LBL = { limit: '限價 LIMIT', market: '市價 MARKET', at_open: '開盤價 @market open price', at_close: '收盤價 @market close price', custom: '自訂 Custom' };
+  const TYPE_SHORT = { limit: '限價', market: '市價', at_open: '@market open', at_close: '@market close', custom: '自訂' };
   const TIF_LBL = { rod: 'ROD 當日有效', ioc: 'IOC', fok: 'FOK' };
 
   return (
@@ -322,6 +331,11 @@ function TradeScreen({ onSubmit }) {
       <div className="m-stepper">
         {steps.map((_, i) => <div key={i} className={`dot ${i === step ? 'on' : ''}`} />)}
       </div>
+      {isEdit && (
+        <div style={{ margin: '0 16px 8px', padding: '8px 12px', background: 'var(--tw-navy-050)', border: '1px solid var(--tw-navy-100)', borderRadius: 8, font: '500 12px/1.4 var(--tw-font-sans)', color: 'var(--tw-fg-2)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Icon name="pencil" size={14} color="var(--tw-navy-600)" /> 修改委託 {initial.id} · 後台接單前可調整
+        </div>
+      )}
       <div style={{ padding: '0 16px 8px', font: '600 15px/1 var(--tw-font-sans)', color: 'var(--tw-fg-1)' }}>
         {steps[step]}
       </div>
@@ -376,6 +390,20 @@ function TradeScreen({ onSubmit }) {
                     }}>{TYPE_SHORT[tp]}</button>
                 ))}
               </div>
+              <button
+                onClick={() => setType('custom')}
+                style={{
+                  marginTop: 6, width: '100%', padding: '10px', borderRadius: 8, border: '1px solid',
+                  borderColor: type === 'custom' ? 'var(--tw-gold-600)' : 'var(--tw-border)',
+                  background: type === 'custom' ? 'var(--tw-gold-600)' : 'white',
+                  color: type === 'custom' ? 'white' : 'var(--tw-fg-2)',
+                  font: '600 12px/1 var(--tw-font-sans)', cursor: 'pointer'
+                }}>其他 / 自訂委託</button>
+              {type === 'custom' && (
+                <input className="m-num-input" style={{ textAlign: 'left', fontSize: 14, marginTop: 8 }}
+                  value={customType} onChange={e => setCustomType(e.target.value)}
+                  placeholder="輸入委託指示，例如：停損 168 觸發、分批買進" />
+              )}
             </div>
             <div className="m-field">
               <div className="m-label">委託效期</div>
@@ -387,7 +415,7 @@ function TradeScreen({ onSubmit }) {
             </div>
             <div style={{ padding: '12px 14px', background: 'var(--tw-navy-050)', border: '1px solid var(--tw-navy-100)', borderRadius: 10, font: '400 12px/1.5 var(--tw-font-sans)', color: 'var(--tw-fg-2)' }}>
               <Icon name="info" size={14} color="var(--tw-navy-500)" style={{ verticalAlign: 'middle', marginRight: 6 }} />
-              委託送出後僅後台人員可協助取消。
+              委託送出後、後台接單前，您可於「總覽」自行取消或修改。
             </div>
           </>
         )}
@@ -423,17 +451,17 @@ function TradeScreen({ onSubmit }) {
               {[
                 { k: '市場', v: mName(market) },
                 { k: '方向', v: side === 'buy' ? '買進' : '賣出' },
-                { k: '類型', v: TYPE_LBL[type] || type },
+                { k: '類型', v: type === 'custom' ? (customType || '自訂委託') : (TYPE_LBL[type] || type) },
                 { k: '效期', v: TIF_LBL[tif] || tif },
                 { k: '數量', v: Number(qty).toLocaleString() + ' 股' },
                 ...(type === 'limit' ? [{ k: '限價', v: mCcy(market) + ' ' + Number(price).toFixed(2) }] : []),
-                { k: '預估金額', v: mCcy(market) + ' ' + estimate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+                { k: '預估金額', v: type === 'limit' ? (mCcy(market) + ' ' + estimate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : '依市場成交價結算' },
               ].map(r => (
                 <div key={r.k} className="m-kv"><span className="k">{r.k}</span><span className="v">{r.v}</span></div>
               ))}
             </div>
             <div style={{ padding: '0 16px 14px', font: '400 11px/1.5 var(--tw-font-sans)', color: 'var(--tw-fg-4)' }}>
-              送出後無法由客戶端自行取消，請確認內容正確。
+              送出後在後台接單前仍可自行取消或修改，請確認內容正確。
             </div>
           </div>
         )}
@@ -445,8 +473,19 @@ function TradeScreen({ onSubmit }) {
         {step === 3 && (
           <button className={`m-btn ${side === 'buy' ? 'm-btn-buy' : 'm-btn-sell'}`}
             style={{ flex: 1, borderRadius: 10 }}
-            onClick={() => setDone(true)}>
-            {side === 'buy' ? '確認買進' : '確認賣出'}
+            onClick={() => {
+              if (isEdit) {
+                onSave && onSave({
+                  market, sym, side, type,
+                  custom_type: type === 'custom' ? customType : null,
+                  time_in_force: tif, qty: Number(qty),
+                  price: type === 'limit' ? Number(price) : null,
+                });
+              } else {
+                setDone(true);
+              }
+            }}>
+            {isEdit ? '確認修改' : (side === 'buy' ? '確認買進' : '確認賣出')}
           </button>
         )}
       </div>
@@ -458,6 +497,17 @@ function TradeScreen({ onSubmit }) {
 function App() {
   const [user, setUser]   = useState(null);
   const [tab,  setTab]    = useState('home');
+  const [orders, setOrders] = useState(ORDERS);
+  const [editOrder, setEditOrder] = useState(null);
+  const [confirmCancel, setConfirmCancel] = useState(null);
+
+  const cancelOrder = (o) => setOrders(list => list.map(x => x.id === o.id ? { ...x, status: 'cancelled' } : x));
+  const startModify = (o) => { setEditOrder(o); setTab('trade'); };
+  const saveOrder = (data) => {
+    if (editOrder) setOrders(list => list.map(x => x.id === editOrder.id ? { ...x, ...data } : x));
+    setEditOrder(null);
+    setTab('home');
+  };
 
   if (!user) return (
     <IOSDevice dark width={390} height={844}>
@@ -469,7 +519,7 @@ function App() {
 
   return (
     <IOSDevice dark width={390} height={844}>
-      <div className="app">
+      <div className="app" style={{ position: 'relative' }}>
         <div className="m-nav">
           <BrandMark size={22} />
           <div>
@@ -478,9 +528,26 @@ function App() {
           <div style={{ marginLeft: 'auto', width: 28, height: 28, borderRadius: '50%', background: 'var(--tw-gold-600)', color: 'var(--tw-navy-900)', display: 'grid', placeItems: 'center', font: '600 11px/1 var(--tw-font-sans)', cursor: 'pointer' }}
             onClick={() => setUser(null)}>{user.slice(-2)}</div>
         </div>
-        {tab === 'home'   && <HomeScreen userName={user} onTrade={() => setTab('trade')} />}
-        {tab === 'trade'  && <TradeScreen />}
-        <TabBar tab={tab} setTab={setTab} />
+        {tab === 'home'   && <HomeScreen userName={user} orders={orders} onCancel={(o) => setConfirmCancel(o)} onModify={startModify} />}
+        {tab === 'trade'  && <TradeScreen key={editOrder ? editOrder.id : 'new'} initial={editOrder} onSave={saveOrder} />}
+        <TabBar tab={tab} setTab={(t) => { if (t === 'trade') setEditOrder(null); setTab(t); }} />
+
+        {confirmCancel && (
+          <div onClick={() => setConfirmCancel(null)}
+            style={{ position: 'absolute', inset: 0, background: 'rgba(10,26,47,0.45)', zIndex: 50, display: 'flex', alignItems: 'flex-end' }}>
+            <div onClick={e => e.stopPropagation()}
+              style={{ background: 'white', width: '100%', borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: '20px 18px 28px' }}>
+              <div style={{ font: '600 16px/1.3 var(--tw-font-sans)', color: 'var(--tw-fg-1)', marginBottom: 8 }}>取消這筆委託？</div>
+              <div style={{ font: '400 13px/1.5 var(--tw-font-sans)', color: 'var(--tw-fg-3)', marginBottom: 18 }}>
+                委託 <strong style={{ fontFamily: 'var(--tw-font-mono)', color: 'var(--tw-fg-1)' }}>{confirmCancel.id}</strong>（{confirmCancel.sym}）將被取消，無法復原。後台尚未接單前可取消。
+              </div>
+              <button className="m-btn m-btn-sell" style={{ borderRadius: 10, marginBottom: 10 }}
+                onClick={() => { cancelOrder(confirmCancel); setConfirmCancel(null); }}>確認取消</button>
+              <button className="m-btn m-btn-sec" style={{ borderRadius: 10 }}
+                onClick={() => setConfirmCancel(null)}>保留委託</button>
+            </div>
+          </div>
+        )}
       </div>
     </IOSDevice>
   );

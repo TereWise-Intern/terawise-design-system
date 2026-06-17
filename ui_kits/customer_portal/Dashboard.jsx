@@ -1,9 +1,10 @@
 // ============================================================
 // TeraWise Trade — Dashboard (overview)
 // ============================================================
-function Dashboard({ onPlaceOrder, userName, orders = [] }) {
+function Dashboard({ onPlaceOrder, onCancelOrder, onModifyOrder, userName, orders = [] }) {
   const [filter, setFilter] = useState('all');
   const [openOrder, setOpenOrder] = useState(null);
+  const [confirmCancel, setConfirmCancel] = useState(null);
   const filtered = orders.filter(o => {
     if (filter === 'all') return true;
     if (filter === 'open') return ['pending', 'accepted', 'processing'].includes(o.status);
@@ -96,6 +97,7 @@ function Dashboard({ onPlaceOrder, userName, orders = [] }) {
               <th className="r">數量</th>
               <th className="r">價格</th>
               <th>狀態</th>
+              <th className="r">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -106,24 +108,39 @@ function Dashboard({ onPlaceOrder, userName, orders = [] }) {
                 <td className="l"><Badge tone={o.market.toLowerCase()}>{o.market}</Badge></td>
                 <td><span style={{ fontWeight: 600 }}>{o.sym}</span></td>
                 <td className="l"><Badge tone={o.side}>{o.side === 'buy' ? 'BUY' : 'SELL'}</Badge></td>
-                <td className="l">{ORDER_TYPE_SHORT[o.type] || o.type}{o.time_in_force ? <span style={{ color: 'var(--tw-fg-4)', marginLeft: 4 }}>· {TIF_SHORT[o.time_in_force]}</span> : null}</td>
+                <td className="l">{orderTypeShort(o)}{o.time_in_force ? <span style={{ color: 'var(--tw-fg-4)', marginLeft: 4 }}>· {TIF_SHORT[o.time_in_force]}</span> : null}</td>
                 <td className="r">{o.qty.toLocaleString()}</td>
                 <td className="r">{o.fill_price != null ? Number(o.fill_price).toFixed(2) : o.price != null ? Number(o.price).toFixed(2) : '市價'}</td>
                 <td className="l"><StatusChip status={o.status} /></td>
+                <td className="r" onClick={e => e.stopPropagation()}>
+                  {CLIENT_EDITABLE(o.status) ? (
+                    <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
+                      <button className="tw-icon-btn" title="修改委託" onClick={() => onModifyOrder && onModifyOrder(o)}><Icon name="pencil" size={15} /></button>
+                      <button className="tw-icon-btn" title="取消委託" onClick={() => setConfirmCancel(o)} style={{ color: 'var(--tw-sell-600)' }}><Icon name="x" size={15} /></button>
+                    </div>
+                  ) : (
+                    <span style={{ color: 'var(--tw-fg-4)', font: '400 12px/1 var(--tw-font-sans)' }}>—</span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <OrderDetail order={openOrder} onClose={() => setOpenOrder(null)} />
+      <OrderDetail order={openOrder} onClose={() => setOpenOrder(null)}
+        onModify={(o) => { setOpenOrder(null); onModifyOrder && onModifyOrder(o); }}
+        onCancel={(o) => setConfirmCancel(o)} />
+      <ConfirmCancel order={confirmCancel}
+        onClose={() => setConfirmCancel(null)}
+        onConfirm={() => { onCancelOrder && onCancelOrder(confirmCancel); setOpenOrder(null); setConfirmCancel(null); }} />
     </div>
   );
 }
 
 window.Dashboard = Dashboard;
 
-function OrderDetail({ order, onClose }) {
+function OrderDetail({ order, onClose, onModify, onCancel }) {
   const isOpen = !!order;
   const o = order ?? {};
   const timeline = [
@@ -162,7 +179,7 @@ function OrderDetail({ order, onClose }) {
                 <div className="tw-kv__k">數量</div>
                 <div className="tw-kv__v">{o.qty?.toLocaleString()} 股</div>
                 <div className="tw-kv__k">委託類型</div>
-                <div className="tw-kv__v is-sans">{ORDER_TYPE_LABEL[o.type] || o.type}</div>
+                <div className="tw-kv__v is-sans">{orderTypeLabel(o)}</div>
                 <div className="tw-kv__k">委託效期</div>
                 <div className="tw-kv__v is-sans">{TIF_LABEL[o.time_in_force || 'rod']}</div>
                 {o.price != null && (
@@ -222,8 +239,18 @@ function OrderDetail({ order, onClose }) {
           )}
         </div>
         <div className="tw-drawer__foot">
-          <Button variant="ghost" icon="phone">聯繫專員</Button>
-          <Button variant="secondary" onClick={onClose}>關閉</Button>
+          {order && CLIENT_EDITABLE(o.status) ? (
+            <>
+              <Button variant="ghost" onClick={onClose}>關閉</Button>
+              <Button variant="danger" icon="x" onClick={() => onCancel && onCancel(order)}>取消委託</Button>
+              <Button variant="secondary" icon="pencil" onClick={() => onModify && onModify(order)}>修改委託</Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" icon="phone">聯繫專員</Button>
+              <Button variant="secondary" onClick={onClose}>關閉</Button>
+            </>
+          )}
         </div>
       </aside>
     </>
@@ -231,3 +258,39 @@ function OrderDetail({ order, onClose }) {
 }
 
 window.OrderDetail = OrderDetail;
+
+// ---------- Cancel confirmation dialog (接單前可取消) ----------
+function ConfirmCancel({ order, onClose, onConfirm }) {
+  const isOpen = !!order;
+  const o = order ?? {};
+  return (
+    <>
+      <div className={`tw-scrim ${isOpen ? 'is-open' : ''}`} onClick={onClose} style={{ zIndex: 60 }} />
+      {isOpen && (
+        <div role="dialog" aria-modal="true" style={{
+          position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          width: 'min(420px, calc(100vw - 32px))', background: 'white',
+          border: '1px solid var(--tw-border)', borderRadius: 8,
+          boxShadow: 'var(--tw-shadow-3)', zIndex: 61, overflow: 'hidden'
+        }}>
+          <div style={{ padding: '20px 22px 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--tw-sell-050)', color: 'var(--tw-sell-600)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                <Icon name="alert-triangle" size={18} />
+              </span>
+              <div style={{ font: 'var(--tw-text-h3)', color: 'var(--tw-fg-1)' }}>取消這筆委託？</div>
+            </div>
+            <div style={{ font: 'var(--tw-text-small)', color: 'var(--tw-fg-3)', lineHeight: 1.6 }}>
+              委託 <strong style={{ fontFamily: 'var(--tw-font-mono)', color: 'var(--tw-fg-1)' }}>{o.id}</strong>（{o.sym} · {Number(o.qty || 0).toLocaleString()} 股）將被取消，無法復原。僅後台接單前可取消。
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, padding: '18px 22px 20px' }}>
+            <Button variant="secondary" onClick={onClose}>保留委託</Button>
+            <Button variant="sell" icon="x" onClick={onConfirm}>確認取消</Button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+window.ConfirmCancel = ConfirmCancel;

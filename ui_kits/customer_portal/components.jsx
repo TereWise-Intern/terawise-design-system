@@ -126,8 +126,20 @@ const ORDER_TYPE_LABEL = {
   market:   '市價 MARKET',
   at_open:  '開盤價 @market open price',
   at_close: '收盤價 @market close price',
+  custom:   '自訂 Custom',
 };
-const ORDER_TYPE_SHORT = { limit: '限價', market: '市價', at_open: '@market open', at_close: '@market close' };
+const ORDER_TYPE_SHORT = { limit: '限價', market: '市價', at_open: '@market open', at_close: '@market close', custom: '自訂' };
+// Resolve a display label honoring the free-text custom_type a client may enter
+function orderTypeLabel(o) {
+  if (o && o.type === 'custom') return String(o.custom_type || '').trim() || '自訂委託';
+  return ORDER_TYPE_LABEL[o && o.type] || (o && o.type) || '';
+}
+function orderTypeShort(o) {
+  if (o && o.type === 'custom') return String(o.custom_type || '').trim() || '自訂';
+  return ORDER_TYPE_SHORT[o && o.type] || (o && o.type) || '';
+}
+// Orders the client may still cancel / modify themselves — only before back-office accepts (接單前)
+const CLIENT_EDITABLE = (status) => status === 'pending';
 const TIF_LABEL = {
   rod: 'ROD 當日有效',
   ioc: 'IOC 立即成交否則取消',
@@ -449,5 +461,6 @@ Object.assign(window, {
   BrandMark, Icon, Button, Field, Segmented, StatusChip, Badge, Num, Steps, Toast,
   STATUS_LABEL, MARKETS, getMarketColors, DeltaChip, LoginScreen, marketStatus, usHoursTW,
   marketCcy, marketName,
-  ORDER_TYPE_LABEL, ORDER_TYPE_SHORT, TIF_LABEL, TIF_SHORT, TYPE_NEEDS_PRICE
+  ORDER_TYPE_LABEL, ORDER_TYPE_SHORT, TIF_LABEL, TIF_SHORT, TYPE_NEEDS_PRICE,
+  orderTypeLabel, orderTypeShort, CLIENT_EDITABLE
 });
